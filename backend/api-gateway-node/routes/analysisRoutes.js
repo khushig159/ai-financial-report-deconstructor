@@ -1,9 +1,8 @@
 const express = require('express');
+const analysisController=require('../controllers/analysercontroller')
 const router = express.Router();
 
-router.get('/test', (req, res) => {
-    res.json({ message: "Analysis routes are working!" });
-});
+router.post('/analyze', analysisController.upload, analysisController.analyzeReport);
 
 
 module.exports = router;
