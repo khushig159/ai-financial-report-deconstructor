@@ -212,7 +212,6 @@ async def analyze_report(file: UploadFile = File(...)):
         elif is_10q:
             print("--- Detected Form Type: 10-Q ---")
             
-             # --- THE CRITICAL FIX FOR 10-Q MD&A ---
             # Step 1: Find the start of the actual report body, after the Table of Contents.
             # A reliable marker is the last occurrence of the "Part I" header.
             part_i_pattern = re.compile(r"part\s+i\s*–\s*financial\s+information", re.IGNORECASE | re.DOTALL)
