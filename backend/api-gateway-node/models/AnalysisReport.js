@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// This schema defines the structure for every analysis report we save in the database.
 const AnalysisReportSchema = new mongoose.Schema({
   filename: { type: String, required: true },
   uploadDate: { type: Date, default: Date.now },
@@ -14,11 +13,16 @@ const AnalysisReportSchema = new mongoose.Schema({
     cautiousness_score: Number,
   },
   risk_summary: {
-    top_risks: [String],
+      top_risks: [String]
+  },
+  // --- THE CRITICAL FIX IS HERE ---
+  // It is now correctly defined to accept an object containing an array of strings.
+  risk_comparison: { 
+    comparison_summary: [String]
   },
   raw_risk_factors: { type: String },
+  previous_raw_risk_factors: { type: String },
   raw_management_discussion: { type: String },
 });
 
-// Export the model so other parts of our application can use it
 module.exports = mongoose.model('AnalysisReport', AnalysisReportSchema);

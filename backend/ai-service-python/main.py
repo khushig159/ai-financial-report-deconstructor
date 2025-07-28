@@ -109,7 +109,20 @@ def extract_10q_mda_section(full_text: str, start_pattern_str: str, end_pattern_
     except Exception as e:
         print(f"--- ERROR in extract_10q_mda_section: {e}")
         return ""
-
+    
+def sanitize_text_for_ai(text: str) -> str:
+    """A more aggressive function to clean text for AI JSON generation."""
+    if not text:
+        return ""
+    # Replace backslashes with a safe character (like a space)
+    text = text.replace('\\', ' ')
+    # Replace double quotes with single quotes
+    text = text.replace('"', "'")
+    # Remove characters that are invalid in JSON strings and other control chars
+    # This regex removes characters in the C0 and C1 control blocks, plus backspace.
+    text = re.sub(r'[\x00-\x1F\x7F-\x9F\x08]', ' ', text)
+    return text
+ 
 async def get_kpi_analysis(full_text:str):
     print('--AI Task: Extracting KPIs--')
     prompt="""
@@ -121,7 +134,8 @@ async def get_kpi_analysis(full_text:str):
     """
     try:
         model=genai.GenerativeModel('gemini-1.5-flash-latest',generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
-        response=await model.generate_content_async([prompt,full_text[:40000]])
+        # clean_text = sanitize_text_for_ai(full_text[:80000])
+        response=await model.generate_content_async([prompt,full_text[:150000]])
         return json.loads(response.text)
     except Exception as e:
         print(f'--Error in KPI Aalysis:{e}')
@@ -130,13 +144,17 @@ async def get_kpi_analysis(full_text:str):
 async def get_tone_analysis(mda_text: str):
     print("--- AI Task: Analyzing Management Tone ---")
     prompt = """
-    You are an expert in financial linguistics. Analyze the tone of the following "Management's Discussion & Analysis" section.
+You are an expert in financial linguistics. Analyze the tone of the following "Management's Discussion & Analysis" section.
     Is the tone more optimistic, neutral, or cautious than a standard report?
-    Respond ONLY with a single, valid JSON object with two keys: "summary" (a one-sentence summary of the tone) and "cautiousness_score" (a score from 1 to 10, where 10 is extremely cautious).
+
+    IMPORTANT: Your response must be a single, valid JSON object. Ensure all special characters within the summary text, such as backslashes and quotes, are correctly escaped for JSON formatting.
+
+    Respond ONLY with a JSON object with two keys: "summary" (a one-sentence summary of the tone) and "cautiousness_score" (a score from 1 to 10, where 10 is extremely cautious).
     """
     try:
         model = genai.GenerativeModel('gemini-1.5-flash-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
-        response = await model.generate_content_async([prompt, mda_text])
+        clean_text = sanitize_text_for_ai(mda_text)
+        response = await model.generate_content_async([prompt, clean_text])
         return json.loads(response.text)
     except Exception as e:
         print(f"--- ERROR in Tone Analysis: {e}")
@@ -150,7 +168,8 @@ async def get_risk_summary(risk_text: str):
     """
     try:
         model = genai.GenerativeModel('gemini-1.5-flash-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
-        response = await model.generate_content_async([prompt, risk_text])
+        clean_text = sanitize_text_for_ai(risk_text)
+        response = await model.generate_content_async([prompt, clean_text])
         return json.loads(response.text)
     except Exception as e:
         print(f"--- ERROR in Risk Summary: {e}")

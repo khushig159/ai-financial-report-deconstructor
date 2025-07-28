@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography
-} from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 
 // A helper function to format the metric names for display
 const formatMetricName = (name) => {
@@ -17,35 +15,56 @@ const formatMetricName = (name) => {
   }
 };
 
+// A single, reusable card for each metric
+function MetricCard({ title, value }) {
+  return (
+    <Paper 
+      elevation={4} 
+      sx={{ 
+        p: 2, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        height: '100%',
+        backgroundColor: '#2a2a2a'
+      }}
+    >
+      <Typography variant="subtitle1" color="text.secondary">
+        {title}
+      </Typography>
+      <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main', mt: 1 }}>
+        {value}
+      </Typography>
+    </Paper>
+  );
+}
+
 function KeyMetricsTable({ data }) {
   if (!data) {
     return <Typography>No key metrics data available.</Typography>;
   }
 
-  // This converts your data object into an array we can easily display
-  const metrics = Object.entries(data).map(([key, value]) => ({ key, value }));
-
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="key metrics table">
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ fontWeight: 'bold' }}>Metric</TableCell>
-            <TableCell align="right" sx={{ fontWeight: 'bold' }}>Value</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {metrics.map((metric) => (
-            <TableRow key={metric.key}>
-              <TableCell component="th" scope="row">
-                {formatMetricName(metric.key)}
-              </TableCell>
-              <TableCell align="right">{metric.value}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Box>
+      <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+        Key Financial Metrics
+      </Typography>
+      {/* --- THE CRITICAL FIX IS HERE --- */}
+      {/* This Box uses a direct CSS Grid layout for perfect alignment. */}
+      <Box 
+        sx={{
+          display: 'grid',
+          // On small screens (xs), one column. On medium screens (md) and up, three columns.
+          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' },
+          gap: 2, // This creates the space between the cards
+        }}
+      >
+        <MetricCard title="Total Revenue" value={data.revenue || 'N/A'} />
+        <MetricCard title="Net Income" value={data.netIncome || 'N/A'} />
+        <MetricCard title="Diluted EPS" value={data.eps || 'N/A'} />
+      </Box>
+    </Box>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback,useRef } from 'react';
 import { 
   createTheme, ThemeProvider, CssBaseline, Box, Typography, AppBar, Toolbar, 
   Tabs, Tab, Paper, Container, CircularProgress, Alert, List, ListItem, ListItemText, 
@@ -12,6 +12,7 @@ import useAnalysisStore from './stores/useAnalysisStore';
 import KeyMetricsTable from './components/KeyMetricsTable';
 import ManagementTone from './components/ManagementTone';
 import RiskSummary from './components/RiskSummary';
+import RiskDiffViewer from './components/RiskDiffViewer';
 
 // --- THEME CONFIGURATION (Unchanged) ---
 const darkTheme = createTheme({
@@ -32,6 +33,7 @@ function TabPanel(props) {
 
 // --- UPDATED FileUploader Component with your logic ---
 function FileUploader() {
+  const analysisTriggered = useRef(false); // The critical fix to prevent loops
   const { startLoading, setResult, setError, isLoading, analysisResult } = useAnalysisStore();
   const [files, setFiles] = useState([]);
 
@@ -49,7 +51,8 @@ function FileUploader() {
   
   // This useEffect hook triggers the analysis when we have exactly 2 files
   useEffect(() => {
-    if (files.length === 2 && !isLoading) {
+    if (files.length === 2 && !isLoading && !analysisTriggered.current) {
+      analysisTriggered.current=true
       const uploadAndAnalyze = async () => {
         startLoading();
         const formData = new FormData();
@@ -75,6 +78,7 @@ function FileUploader() {
   useEffect(() => {
       if (analysisResult) {
           setFiles([]);
+          analysisTriggered.current=false;
       }
   }, [analysisResult]);
 
@@ -87,6 +91,7 @@ function FileUploader() {
 
   const handleClear = () => {
       setFiles([]);
+      analysisTriggered.current=false;
   }
 
   return (
@@ -170,7 +175,11 @@ function App() {
                 </Typography>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
-                Side-by-side risk factor comparison will be displayed here.
+                <RiskDiffViewer
+                oldText={analysisResult.previous_raw_risk_factors}
+                newText={analysisResult.raw_risk_factors}
+                comparisonSummary={analysisResult.risk_comparison}
+                />
               </TabPanel>
               <TabPanel value={tabValue} index={2}>
                  <Typography component="pre" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
