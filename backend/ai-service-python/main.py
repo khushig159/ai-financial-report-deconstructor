@@ -165,6 +165,8 @@ async def get_risk_summary(risk_text: str):
     prompt = """
     You are a compliance officer. From the "Risk Factors" section provided, identify and summarize the top 3 most significant or newly emphasized risks.
     Respond ONLY with a single, valid JSON object with one key: "top_risks", which should be an array of strings. Each string should be a one-sentence summary of a key risk.
+    IMPORTANT: Do not use any unicode escape sequences like \\u0024 in your response. Use the actual characters like $.
+
     """
     try:
         model = genai.GenerativeModel('gemini-1.5-flash-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
@@ -174,7 +176,109 @@ async def get_risk_summary(risk_text: str):
     except Exception as e:
         print(f"--- ERROR in Risk Summary: {e}")
         return {"top_risks": ["Error summarizing risks."]}
+    
+async def get_competitor_analysis(mda_text: str):
+    """Uses AI to identify competitors and the context of their mention."""
+    print("--- AI Task: Analyzing Competitive Landscape ---")
+    prompt = """
+    You are a strategic analyst. Read the following "Management's Discussion & Analysis" section.
+    Identify all mentions of specific competing companies.
+    For each competitor found, provide a brief, three-sentence summary of the context in which they were mentioned (e.g., "competing on price", "mentioned as a market leader", "partner in a new venture").
+    Respond ONLY with a single, valid JSON object with one key: "competitors". Ensure all special characters within the summary text, such as backslashes and quotes, are correctly escaped for JSON formatting.
+    The value of "competitors" should be an array of objects, where each object has two keys: "name" (the competitor's name) and "context" (the summary).
+    If no competitors are mentioned, return an empty array.
+    IMPORTANT: Do not use any unicode escape sequences like \\u0024 in your response. Use the actual characters like $.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        clean_text = sanitize_text_for_ai(mda_text)
+        response = await model.generate_content_async([prompt, clean_text])
+        print(json.loads(response.text))
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"--- ERROR in Competitor Analysis: {e}")
+        return {"competitors": [{"name": "Error", "context": "Failed to analyze competitive landscape."}]}
+    
+async def get_legal_summary(full_text: str):
+    """Finds and summarizes the Legal Proceedings section from a focused chunk of the document."""
+    print("--- AI Task: Summarizing Legal Proceedings ---")
+    prompt = """
+    You are a legal analyst. First, find the "Legal Proceedings" section in the provided financial report text.
+    Once found, read the section and provide a concise summary of the key legal matters discussed.
+    Focus on the main parties involved and the core issue of each proceeding.
+    Respond ONLY with a single, valid JSON object with one key: "legal_summary",
+    which should be an array of strings. Each string should be a summary of a single legal matter.
+    If the section does not exist or no specific proceedings are mentioned, return an empty array.
+    IMPORTANT: Do not use any unicode escape sequences like \\u0024 in your response. Use the actual characters like $.
+    If the section does not exist, return an empty array.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        
+        # --- THE CRITICAL OPTIMIZATION IS HERE ---
+        # We create a "middle chunk" of the document to search within.
+        # This starts after the typical intro sections and covers a large area.
+        start_char = 15000  # Skip the first ~15 pages of boilerplate
+        end_char = 150000 # Search within the next ~135 pages
+        # middle_chunk = full_text[start_char:end_char]
+        
+        clean_text = sanitize_text_for_ai(full_text)
+        response = await model.generate_content_async([prompt, clean_text])
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"--- ERROR in Legal Summary: {e}")
+        return {"legal_summary": ["Error summarizing legal proceedings."]}
+async def get_guidance_analysis(mda_text: str):
+    """Identifies and classifies forward-looking statements."""
+    print("--- AI Task: Analyzing Guidance & Outlook ---")
+    prompt = """
+    You are a quantitative analyst specializing in parsing forward-looking statements.
+    Read the following "Management's Discussion & Analysis" section and identify any statement that provides guidance or an outlook on future performance.
+    For each statement found, classify its sentiment as 'Positive', 'Neutral', or 'Negative'.
+    IMPORTANT: Do not use any unicode escape sequences like \\u0024 in your response. Use the actual characters like $.
 
+    Respond ONLY with a single, valid JSON object with one key: "guidance".
+    The value of "guidance" should be an array of objects, where each object has two keys: "statement" (the quoted forward-looking statement) and "sentiment" (the classification).
+    
+    Example: [{"statement": "We expect net sales to grow between 7% and 11%", "sentiment": "Positive"}]
+    
+    If no forward-looking statements are found, return an empty array.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        clean_text = sanitize_text_for_ai(mda_text)
+        response = await model.generate_content_async([prompt, clean_text])
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"--- ERROR in Guidance Analysis: {e}")
+        return {"guidance": [{"statement": "Error analyzing guidance.", "sentiment": "Error"}]}
+
+async def get_financial_statements(financial_statements_text: str):
+    """Extracts the three core financial statements from a pre-parsed text block."""
+    print("--- AI Task: Deconstructing Financial Statements ---")
+    prompt = """
+    You are an expert financial data extraction bot. The following text contains the core financial statements from a report.
+    Your task is to parse the three main statements:
+    1. Consolidated Statements of Operations (or Income Statement)
+    2. Consolidated Balance Sheets
+    3. Consolidated Statements of Cash Flows
+
+    For each statement, extract the key line items and their values for the two most recent periods presented.
+    
+    Respond ONLY with a single, valid JSON object with three main keys: "income_statement", "balance_sheet", and "cash_flow_statement".
+    Each key should contain an array of objects, where each object has three keys: "item" (the line item name), "current_period", and "previous_period".
+    
+    If a statement cannot be found, return an empty array for that key.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        clean_text = sanitize_text_for_ai(financial_statements_text)
+        response = await model.generate_content_async([prompt, clean_text])
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"--- ERROR in Financial Statement Deconstruction: {e}")
+        return {"income_statement": [], "balance_sheet": [], "cash_flow_statement": []}
+                      
 @app.get("/")
 def read_root():
     return {"message": "AI Service is running"}
@@ -194,6 +298,7 @@ async def analyze_report(file: UploadFile = File(...)):
         
         risk_factors_text = ""
         mda_text = ""
+        financial_statements_text=""
 
         doc_header = full_text[:3000].lower()
         is_10k = "form 10-k" in doc_header
@@ -204,10 +309,12 @@ async def analyze_report(file: UploadFile = File(...)):
             risk_start = r"Item\s+1\s*A\s*\..*?Risk\s+Factors"
             risk_end = r"Item\s+1\s*B\s*\."
             risk_factors_text = extract_last_match_section(full_text, risk_start, risk_end)
+            financial_statements_text = extract_last_match_section(full_text, r"Item\s+8\s*\..*?Financial\s+Statements\s+and\s+Supplementary\s+Data", r"Item\s+9\s*\.")
 
             mda_start = r"Item\s+7\s*\..*?Management['’]?s\s+Discussion"
             mda_end = r"Item\s+(?:7A|8)\s*\."
             mda_text = extract_last_match_section(full_text, mda_start, mda_end)
+
 
         elif is_10q:
             print("--- Detected Form Type: 10-Q ---")
@@ -232,22 +339,45 @@ async def analyze_report(file: UploadFile = File(...)):
             risk_start_10q = r"Item\s+1\s*A\s*\..*?Risk\s+Factors"
             risk_end_10q = r"Item\s+2\s*\."
             risk_factors_text = extract_last_match_section(full_text, risk_start_10q, risk_end_10q)
+
+            financial_statements_text = extract_10q_mda_section(report_body_text, r"Item\s+1\s*\..*?Financial\s+Statements", r"Item\s+2\s*\.")
+
         
         print(f"--- Parsing Complete: Found {len(risk_factors_text)} risk chars, {len(mda_text)} MDA chars.")
 
         print("--- Starting Sequential AI Analysis to respect API limits ---")
         
         kpi_results = await get_kpi_analysis(full_text)
-        print("--- Waiting 30 seconds before next API call... ---")
-        await asyncio.sleep(30)
+        print("--- Waiting 15 seconds before next API call... ---")
+        await asyncio.sleep(15)
 
         tone_results = await get_tone_analysis(mda_text) if mda_text else {"summary": "N/A", "cautiousness_score": 0}
-        print("--- Waiting 30 seconds before next API call... ---")
-        await asyncio.sleep(30)
+        print("--- Waiting 15 seconds before next API call... ---")
+        await asyncio.sleep(15)
 
         risk_results = await get_risk_summary(risk_factors_text) if risk_factors_text else {"top_risks": ["N/A"]}
-        
+        print("--- Waiting 15 seconds before next API call... ---")
+        await asyncio.sleep(15)
+
+        competitor_results = await get_competitor_analysis(mda_text) if mda_text else {"competitors": []}
+        print("--- Waiting 15 seconds before next API call... ---")
+        await asyncio.sleep(15)
+
+        legal_results = await get_legal_summary(full_text)
+        print("--- Waiting 15 seconds before next API call... ---")
+        await asyncio.sleep(15)
+        guidance_results = await get_guidance_analysis(mda_text) if mda_text else {"guidance": []}
+        print("--- Waiting 15 seconds before next API call... ---")
+
+        await asyncio.sleep(15)
+        financial_statements_results = await get_financial_statements(financial_statements_text) if financial_statements_text else {"income_statement": [], "balance_sheet": [], "cash_flow_statement": []}
+
+
         print("--- AI Analysis Complete ---")
+
+        print(competitor_results)
+        print(legal_results)
+        print(guidance_results)
 
         
         return {
@@ -256,7 +386,11 @@ async def analyze_report(file: UploadFile = File(...)):
             "management_tone": tone_results,
             "risk_summary": risk_results,
             "raw_risk_factors": risk_factors_text,
-            "raw_management_discussion": mda_text
+            "raw_management_discussion": mda_text,
+            "competitor_analysis": competitor_results,
+            "legal_summary": legal_results,
+            "guidance_analysis": guidance_results, 
+            "financial_statements": financial_statements_results,
         }
 
     except Exception as e:

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Paper, Typography, CircularProgress } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
+import { RadialBarChart, RadialBar, Legend, ResponsiveContainer, PolarAngleAxis } from 'recharts';
 
 function ManagementTone({ data }) {
   if (!data || data.cautiousness_score === -1 || data.summary === "N/A") {
@@ -7,14 +8,16 @@ function ManagementTone({ data }) {
   }
 
   const { summary, cautiousness_score } = data;
-  const scorePercentage = cautiousness_score * 10;
 
-  // This function changes the color of the circle based on the score
-  const getColor = (value) => {
-    if (value <= 3) return 'success'; // Green for optimistic
-    if (value <= 6) return 'warning'; // Yellow for neutral
-    return 'error'; // Red for cautious
-  };
+  // Data for the radial bar chart. Recharts expects an array.
+  const chartData = [
+    {
+      name: 'Cautiousness',
+      score: cautiousness_score,
+      // Fill color changes based on the score
+      fill: cautiousness_score > 6 ? '#f44336' : cautiousness_score > 3 ? '#ff9800' : '#4caf50',
+    },
+  ];
 
   return (
     <Paper sx={{ p: 3, backgroundColor: '#2a2a2a' }}>
@@ -22,54 +25,49 @@ function ManagementTone({ data }) {
         Linguistic Tone Analysis
       </Typography>
       
-      {/* This Box creates the blue line and formats the summary text */}
       <Box sx={{ borderLeft: '4px solid #90caf9', pl: 2, my: 2 }}>
         <Typography variant="body1" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
           "{summary}"
         </Typography>
       </Box>
 
-      {/* This Box centers the gauge and the title */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 4, flexDirection: 'column' }}>
+      {/* --- NEW: Radial Gauge Chart --- */}
+      <Box sx={{ height: 250, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
         <Typography variant="subtitle1" gutterBottom>
           Cautiousness Score
         </Typography>
-        <Box sx={{ position: 'relative', display: 'inline-flex', mt: 1 }}>
-          {/* This is the grey background circle */}
-          <CircularProgress
-            variant="determinate"
-            value={100}
-            size={120}
-            thickness={4}
-            sx={{ color: 'grey.700' }}
-          />
-          {/* This is the colored foreground circle */}
-          <CircularProgress
-            variant="determinate"
-            value={scorePercentage}
-            size={120}
-            thickness={4}
-            color={getColor(cautiousness_score)}
-            sx={{ position: 'absolute', left: 0 }}
-          />
-          {/* This Box puts the number in the middle of the circle */}
-          <Box
-            sx={{
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
-              position: 'absolute',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+        <ResponsiveContainer width="100%" height="100%">
+          <RadialBarChart 
+            cx="50%" 
+            cy="50%" 
+            innerRadius="60%" 
+            outerRadius="80%" 
+            barSize={20} 
+            data={chartData}
+            startAngle={90}
+            endAngle={-270}
           >
-            <Typography variant="h4" component="div" color="text.primary" sx={{ fontWeight: 'bold' }}>
+            <PolarAngleAxis
+              type="number"
+              domain={[0, 10]}
+              angleAxisId={0}
+              tick={false}
+            />
+            <RadialBar
+              background
+              dataKey="score"
+              angleAxisId={0}
+              cornerRadius={10}
+            />
+            {/* This text element displays the score in the center of the gauge */}
+            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="#fff" fontSize="32px" fontWeight="bold">
               {cautiousness_score}
-            </Typography>
-          </Box>
-        </Box>
+            </text>
+             <text x="50%" y="65%" textAnchor="middle" dominantBaseline="middle" fill="#ccc" fontSize="14px">
+              out of 10
+            </text>
+          </RadialBarChart>
+        </ResponsiveContainer>
       </Box>
     </Paper>
   );

@@ -2,18 +2,8 @@ import React from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 
 // A helper function to format the metric names for display
-const formatMetricName = (name) => {
-  switch (name) {
-    case 'revenue':
-      return 'Total Revenue';
-    case 'netIncome':
-      return 'Net Income';
-    case 'eps':
-      return 'Diluted EPS';
-    default:
-      return name;
-  }
-};
+
+
 
 // A single, reusable card for each metric
 function MetricCard({ title, value }) {

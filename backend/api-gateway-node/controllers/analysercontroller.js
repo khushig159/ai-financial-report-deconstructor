@@ -94,12 +94,20 @@ exports.analyzeReport = async (req, res) => {
             management_tone: currentAnalysis.management_tone,
             risk_summary: currentAnalysis.risk_summary,
             raw_risk_factors: currentAnalysis.raw_risk_factors,
+            competitor_analysis: currentAnalysis.competitor_analysis, 
             previous_raw_risk_factors: previousAnalysis.raw_risk_factors,
             raw_management_discussion: currentAnalysis.raw_management_discussion,
+            legal_summary:currentAnalysis.legal_summary,
+            guidance_analysis:currentAnalysis.guidance_analysis,
+            financial_statements:currentAnalysis.financial_statements,
         };
+
 
         const newReport = new AnalysisReport(finalReport);
         await newReport.save();
+
+        console.log(finalReport)
+
         console.log("Analysis report saved to MongoDB.");
 
         res.status(200).json(finalReport);
