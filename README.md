@@ -4,56 +4,62 @@ AI-Powered Financial Report Deconstructor & Anomaly Detector
 The Problem: The Analyst's Bottleneck
 Financial analysts at institutions like J.P. Morgan spend thousands of hours manually reading dense, 50+ page quarterly (10-Q) and annual (10-K) reports. This process is time-consuming, prone to human error, and makes it difficult to spot subtle but critical changes between reporting periods. Key data extraction, tone analysis, and risk identification are manual, repetitive tasks that form a significant bottleneck in the financial analysis workflow.
 
-The Solution: Automated Financial Intelligence
+The Solution: An AI-Driven Analytical Co-Pilot
 This project is a professional-grade, full-stack web platform designed to solve this exact problem. It empowers an analyst to upload SEC reports and instantly receive a multi-faceted, structured dashboard that provides deep, AI-driven insights. This tool transforms unstructured PDF data into actionable financial intelligence, allowing analysts to focus on high-level strategy instead of low-level data extraction.
 
 Features
-Automated Multi-Form Parsing: A robust backend parser that intelligently detects the form type (10-K or 10-Q) and its internal structure (Part I, Part II) to reliably extract key sections like "Risk Factors" and "Management's Discussion & Analysis."
+AI Co-Pilot & Synthesis
+AI-Generated Executive Summary: A "Blink" report that synthesizes all other analyses into a concise, high-level summary, as if an analyst were briefing a portfolio manager.
 
-Interactive Data Visualization:
+Anomaly & Red Flag Detection: An AI function that acts as a forensic accountant, scanning the report for anomalies, inconsistencies, or potential red flags (e.g., unusual accounting changes, vague language).
 
+Interactive Data Visualization
 Key Metrics Dashboard: Displays core financial data (Revenue, Net Income, EPS) in clean, professional "stat cards."
 
 Bar Chart Analysis: A dynamic bar chart for at-a-glance comparison of Revenue vs. Net Income.
 
-Sentiment Gauge: A radial gauge chart that visually represents the "cautiousness score" of the management's tone, providing an immediate sense of sentiment.
+Sentiment Gauge: A radial gauge chart that visually represents the "cautiousness score" of the management's tone.
 
-Advanced AI Analysis Suite:
+Historical Trend Analysis: Leverages a persistent MongoDB database to display line charts of key metrics and sentiment scores over time.
+
+Interactive Financials: Allows users to click on line items in the financial statements to see their historical trends charted instantly.
+
+Deep Dive AI Analysis Suite
+Financial Statement Deconstruction: An advanced AI module that parses and converts the core financial statements (Income, Balance Sheet, Cash Flow) from the PDF into structured, machine-readable JSON data.
+
+Financial Ratio Analysis: Automatically calculates key financial ratios (e.g., Gross Margin %, Debt-to-Equity) from the deconstructed statements.
+
+Industry Benchmarking: Provides an AI-generated comparison of the company's financial ratios against typical industry averages.
 
 Competitor Intelligence: Scans the report to identify mentions of competing companies and summarizes the strategic context.
 
-Legal Proceedings Summary: Finds and summarizes key lawsuits and government investigations mentioned in the report.
+Legal Proceedings Summary: Finds and summarizes key lawsuits and government investigations.
 
 Guidance & Outlook: Identifies and classifies forward-looking statements about future performance as Positive, Neutral, or Negative.
 
-Financial Statement Deconstruction: The most advanced feature, which uses AI to parse and convert the core financial statements (Income, Balance Sheet, Cash Flow) from the PDF into structured, machine-readable JSON data.
+Debt & Covenant Deconstruction: Extracts specific details about the company's debt schedule and any associated rules (covenants).
 
-Executive Change Analysis: Scans the document for mentions of changes in key leadership roles, flagging potential corporate governance shifts.
+ESG Mention Analysis: Finds and summarizes the company's statements on Environmental, Social, and Governance (ESG) topics.
 
-Historical Trend Analysis:
+Interactive Footnote Explorer: Creates a summarized, clickable index of the dense "Notes to Consolidated Financial Statements" section.
 
-Leverages a persistent MongoDB database to store all past analyses.
-
-Features a Line Chart that plots key metrics over time, allowing analysts to track a company's performance across multiple reporting periods.
-
-Professional UI/UX:
-
-A sleek, dark-themed dashboard built with React and MUI, designed with a "Bloomberg Terminal" aesthetic for serious financial analysis.
+Professional UI/UX
+A sleek, dark-themed dashboard built with React and MUI, designed with a "Bloomberg Terminal" aesthetic.
 
 A responsive side-by-side Diff Viewer that highlights word-level changes in the "Risk Factors" section between two reports.
 
 Tech Stack & Architecture
 This project is built with a modern, scalable microservice architecture.
 
-Frontend: React (with Vite), MUI, Recharts (for data visualization), Zustand (for state management), Axios, React-Dropzone, React-Diff-Viewer.
+Frontend: React (with Vite), MUI, Recharts, Zustand, Axios, React-Dropzone, React-Diff-Viewer.
 
 Backend Gateway: A Node.js server using Express.js that manages client traffic, orchestrates the analysis workflow, and handles all database interactions with Mongoose.
 
 AI / Parsing Service: A high-performance Python microservice built with FastAPI. Its responsibilities are robust PDF text extraction using PyMuPDF and performing all AI-driven analysis.
 
-Database: MongoDB Atlas is used as a scalable, cloud-based NoSQL database to store all final analysis results.
+Database: MongoDB Atlas is used as a scalable, cloud-based NoSQL database.
 
-AI Engine: Powered by Google Gemini Pro, which is leveraged for all complex natural language processing tasks.
+AI Engine: Powered by Google Gemini Pro.
 
 System Workflow
 [User's Browser (React Frontend)]
