@@ -24,7 +24,6 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DescriptionIcon from "@mui/icons-material/Description";
 import axios from "axios";
 import useAnalysisStore from "./stores/useAnalysisStore";
-import KeyMetricsTable from "./components/KeyMetricsTable";
 import ManagementTone from "./components/ManagementTone";
 import RiskSummary from "./components/RiskSummary";
 import RiskDiffViewer from "./components/RiskDiffViewer";
@@ -33,6 +32,13 @@ import CompetitorAnalysis from "./components/CompetitorAnalysis";
 import LegalSummary from "./components/LegalSummary";
 import FinancialStatements from "./components/FinancialStatements";
 import GuidanceOutlook from "./components/GuidanceOutlook";
+import HistoricalTrends from "./components/HistoricalTrends";
+import GovernanceChanges from "./components/GovernanceChnages";
+import ExecutiveSummary from "./components/ExecutiveSummary";
+import RatioAnalysis from "./components/RatioAnalysis";
+import DebtSchedule from "./components/DebtSchedule";
+import EsgAnalysis from "./components/EsgAnalysis";
+import FootnoteExplorer from "./components/FootnoteExplorer";
 
 // --- THEME CONFIGURATION (Unchanged) ---
 const darkTheme = createTheme({
@@ -229,15 +235,24 @@ function App() {
                   value={tabValue}
                   onChange={handleTabChange}
                   aria-label="analysis tabs"
+                  scrollButtons='auto'
+                  variant="scrollable"
                 >
+                  <Tab label="Summary" /> {/* <-- ADD NEW TAB */}
                   <Tab label="Key Metrics" />
-                  <Tab label="Financials" /> {/* <-- ADD NEW TAB */}
+                  <Tab label="Financials" /> 
+                  <Tab label="Ratio Analysis" /> {/* <-- ADD NEW TAB */}
                   <Tab label="Risk Factor Analysis" />
                   <Tab label="Management Tone" />
-                  <Tab label="Competitors" /> {/* <-- ADD NEW TAB */}
-                  <Tab label="Legal" /> {/* <-- ADD NEW TAB */}
-                  <Tab label="Guidance & Outlook" /> {/* <-- ADD NEW TAB */}
+                  <Tab label="Competitors" /> 
+                  <Tab label="Legal" /> 
+                  <Tab label="Guidance & Outlook" /> 
                   <Tab label="Anomaly Flags" />
+                  <Tab label="Governance Changes"/>
+                  <Tab label="Historical Trends" />
+                  <Tab label="Debt & Covenants" /> {/* <-- ADD NEW TAB */}
+                  <Tab label="ESG" /> {/* <-- ADD NEW TAB */}
+                  <Tab label="Footnote Explorer" /> {/* <-- ADD NEW TAB */}
                 </Tabs>
               </Box>
               <TabPanel value={tabValue} index={0}>
@@ -245,7 +260,7 @@ function App() {
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
                 >
-                  <MetricsDashboard data={analysisResult.key_metrics} />
+                  <ExecutiveSummary data={analysisResult} />
                 </Typography>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
@@ -253,10 +268,27 @@ function App() {
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
                 >
-                 <FinancialStatements data={analysisResult.financial_statements}/>
+                  <MetricsDashboard data={analysisResult.key_metrics} />
                 </Typography>
               </TabPanel>
               <TabPanel value={tabValue} index={2}>
+                <Typography
+                  component="pre"
+                  sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                >
+                 <FinancialStatements data={analysisResult.financial_statements}/>
+                </Typography>
+              </TabPanel>
+              <TabPanel value={tabValue} index={3}>
+                <Typography
+                  component="pre"
+                  sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                >
+                 <RatioAnalysis data={analysisResult.financial_ratios}
+                 benchmarkData={analysisResult.industry_benchmarks} />
+                </Typography>
+              </TabPanel>
+              <TabPanel value={tabValue} index={4}>
                 <Typography
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
@@ -268,7 +300,7 @@ function App() {
                   />
                 </Typography>
               </TabPanel>
-              <TabPanel value={tabValue} index={3}>
+              <TabPanel value={tabValue} index={5}>
                 <Typography
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
@@ -276,7 +308,7 @@ function App() {
                   <ManagementTone data={analysisResult.management_tone} />{" "}
                 </Typography>
               </TabPanel>
-              <TabPanel value={tabValue} index={4}>
+              <TabPanel value={tabValue} index={6}>
                 <Typography
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
@@ -284,7 +316,7 @@ function App() {
                   <CompetitorAnalysis data={analysisResult.competitor_analysis} />{" "}
                 </Typography>
               </TabPanel>
-              <TabPanel value={tabValue} index={5}>
+              <TabPanel value={tabValue} index={7}>
                 <Typography
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
@@ -292,7 +324,7 @@ function App() {
                 <LegalSummary data={analysisResult.legal_summary} />
                 </Typography>
               </TabPanel>
-              <TabPanel value={tabValue} index={6}>
+              <TabPanel value={tabValue} index={8}>
                 <Typography
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
@@ -300,12 +332,52 @@ function App() {
                 <GuidanceOutlook data={analysisResult.guidance_analysis} />
                 </Typography>
               </TabPanel>
-              <TabPanel value={tabValue} index={7}>
+              <TabPanel value={tabValue} index={9}>
                 <Typography
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
                 >
-                  <RiskSummary data={analysisResult.risk_summary} />
+                  <RiskSummary data={analysisResult.risk_summary} redFlagsData={analysisResult.red_flags}/>
+                </Typography>
+              </TabPanel>
+              <TabPanel value={tabValue} index={10}>
+                <Typography
+                  component="pre"
+                  sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                >
+                  <GovernanceChanges data={analysisResult.governance_changes} />
+                </Typography>
+              </TabPanel>
+              <TabPanel value={tabValue} index={11}>
+                <Typography
+                  component="pre"
+                  sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                >
+                  <HistoricalTrends filename={analysisResult.filename} />
+                </Typography>
+              </TabPanel>
+              <TabPanel value={tabValue} index={12}>
+                <Typography
+                  component="pre"
+                  sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                >
+                  <DebtSchedule data={analysisResult.debt_details} />
+                </Typography>
+              </TabPanel>
+              <TabPanel value={tabValue} index={13}>
+                <Typography
+                  component="pre"
+                  sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                >
+                  <EsgAnalysis data={analysisResult.esg_analysis} />
+                </Typography>
+              </TabPanel>
+              <TabPanel value={tabValue} index={13}>
+                <Typography
+                  component="pre"
+                  sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                >
+                  <FootnoteExplorer data={analysisResult.footnote_summary} />
                 </Typography>
               </TabPanel>
             </Paper>

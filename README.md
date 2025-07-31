@@ -1,43 +1,53 @@
 AI-Powered Financial Report Deconstructor & Anomaly Detector
+(Coming Soon: Link to the live deployed application and an animated GIF of the workflow will be added here.)
+
 The Problem: The Analyst's Bottleneck
-Financial analysts at institutions like J.P. Morgan spend thousands of hours manually reading dense, 50+ page quarterly (10-Q) and annual (10-K) reports. This process is time-consuming, prone to human error, and makes it difficult to spot subtle but critical changes between reporting periods. Key data extraction is a manual copy-paste task, and identifying shifts in management tone or emerging risks requires a level of meticulous, repetitive reading that is a significant bottleneck in the financial analysis workflow.
+Financial analysts at institutions like J.P. Morgan spend thousands of hours manually reading dense, 50+ page quarterly (10-Q) and annual (10-K) reports. This process is time-consuming, prone to human error, and makes it difficult to spot subtle but critical changes between reporting periods. Key data extraction, tone analysis, and risk identification are manual, repetitive tasks that form a significant bottleneck in the financial analysis workflow.
 
 The Solution: Automated Financial Intelligence
-This project is a professional-grade, full-stack web platform designed to solve this exact problem. It empowers an analyst to upload two SEC reports (a current and a previous one) and instantly receive a structured, deconstructed dashboard.
+This project is a professional-grade, full-stack web platform designed to solve this exact problem. It empowers an analyst to upload SEC reports and instantly receive a multi-faceted, structured dashboard that provides deep, AI-driven insights. This tool transforms unstructured PDF data into actionable financial intelligence, allowing analysts to focus on high-level strategy instead of low-level data extraction.
 
-The application automates the most painful parts of the analyst's job by using a sophisticated backend to:
+Features
+Automated Multi-Form Parsing: A robust backend parser that intelligently detects the form type (10-K or 10-Q) and its internal structure (Part I, Part II) to reliably extract key sections like "Risk Factors" and "Management's Discussion & Analysis."
 
-Parse complex PDF documents to extract raw text.
+Interactive Data Visualization:
 
-Analyze the text with targeted AI calls to extract key financial metrics (KPIs), assess the linguistic tone of management's discussion, and summarize the most significant risks.
+Key Metrics Dashboard: Displays core financial data (Revenue, Net Income, EPS) in clean, professional "stat cards."
 
-Compare the "Risk Factors" sections between the two periods to instantly flag new, removed, or altered risks.
+Bar Chart Analysis: A dynamic bar chart for at-a-glance comparison of Revenue vs. Net Income.
 
-The result is a high-value analytical tool that transforms unstructured, dense reports into actionable financial intelligence, allowing analysts to focus on high-level strategy instead of low-level data extraction.
+Sentiment Gauge: A radial gauge chart that visually represents the "cautiousness score" of the management's tone, providing an immediate sense of sentiment.
 
-Live Demo & Features
-(Coming Soon: Link to the live deployed application and an animated GIF of the workflow will be added here after deployment.)
+Advanced AI Analysis Suite:
 
-Dual PDF Upload: A clean, drag-and-drop interface for uploading the current and previous financial reports.
+Competitor Intelligence: Scans the report to identify mentions of competing companies and summarizes the strategic context.
 
-Automated Parsing: A robust backend parser that intelligently identifies and extracts the "Risk Factors" and "Management's Discussion & Analysis" sections from any standard 10-K or 10-Q file.
+Legal Proceedings Summary: Finds and summarizes key lawsuits and government investigations mentioned in the report.
 
-AI-Powered KPI Extraction: Automatically finds and displays key metrics like Total Revenue, Net Income, and EPS from the report.
+Guidance & Outlook: Identifies and classifies forward-looking statements about future performance as Positive, Neutral, or Negative.
 
-Linguistic Tone Analysis: Provides a qualitative summary and a quantitative "cautiousness score" (1-10) based on the language used in the MD&A section.
+Financial Statement Deconstruction: The most advanced feature, which uses AI to parse and convert the core financial statements (Income, Balance Sheet, Cash Flow) from the PDF into structured, machine-readable JSON data.
 
-Risk & Anomaly Flagging: Summarizes the top 3 most significant risks identified in the current report.
+Executive Change Analysis: Scans the document for mentions of changes in key leadership roles, flagging potential corporate governance shifts.
 
-Side-by-Side Diff Viewer: A professional, color-coded comparison of the "Risk Factors" sections from both reports, visually highlighting additions and deletions to instantly spot changes.
+Historical Trend Analysis:
 
-Professional Dark-Themed UI: A dashboard designed with a "Bloomberg Terminal" aesthetic, built for serious financial analysis.
+Leverages a persistent MongoDB database to store all past analyses.
+
+Features a Line Chart that plots key metrics over time, allowing analysts to track a company's performance across multiple reporting periods.
+
+Professional UI/UX:
+
+A sleek, dark-themed dashboard built with React and MUI, designed with a "Bloomberg Terminal" aesthetic for serious financial analysis.
+
+A responsive side-by-side Diff Viewer that highlights word-level changes in the "Risk Factors" section between two reports.
 
 Tech Stack & Architecture
-This project is built with a modern, scalable microservice architecture, separating the web-facing API from the heavy-duty AI processing.
+This project is built with a modern, scalable microservice architecture.
 
-Frontend: Built with React (using Vite) and MUI for a professional UI. State management is handled by Zustand, with Axios for API calls, React-Dropzone for file uploads, and React-Diff-Viewer for the comparison view.
+Frontend: React (with Vite), MUI, Recharts (for data visualization), Zustand (for state management), Axios, React-Dropzone, React-Diff-Viewer.
 
-Backend Gateway: A Node.js server using Express.js that manages all client-facing traffic, orchestrates the analysis workflow, and handles all database interactions with Mongoose.
+Backend Gateway: A Node.js server using Express.js that manages client traffic, orchestrates the analysis workflow, and handles all database interactions with Mongoose.
 
 AI / Parsing Service: A high-performance Python microservice built with FastAPI. Its responsibilities are robust PDF text extraction using PyMuPDF and performing all AI-driven analysis.
 

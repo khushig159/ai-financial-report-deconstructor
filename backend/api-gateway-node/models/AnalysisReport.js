@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-const StatementItemSchema=new mongoose.Schema({
-  item:String,
-  current_period:String,
-  previous_period:String,
+const StatementItemSchema = new mongoose.Schema({
+  item: String,
+  current_period: String,
+  previous_period: String,
 })
 
 const AnalysisReportSchema = new mongoose.Schema({
@@ -42,11 +42,46 @@ const AnalysisReportSchema = new mongoose.Schema({
     }]
   },
   legal_summary: { legal_summary: [String] },
-  financial_statements:{
-    income_statement:[StatementItemSchema],
-    balance_sheet:[StatementItemSchema],
-    cash_flow_statement:[StatementItemSchema]
-  }
+  financial_statements: {
+    income_statement: [StatementItemSchema],
+    balance_sheet: [StatementItemSchema],
+    cash_flow_statement: [StatementItemSchema]
+  },
+  governance_changes: [String],
+  red_flags: [String],
+  financial_ratios: {
+    ratios: [{
+      name: String,
+      value: String,
+    }]
+  },
+  industry_benchmarks: {
+    benchmarks: [{
+      name: String,
+      value: String,
+      comparison: String, // e.g., "Above Average", "Below Average"
+    }]
+  },
+  debt_details: {
+    debt_schedule: [{
+      year: String,
+      principal_due: String,
+    }],
+    covenants: [String]
+  },
+  footnote_summary: {
+    footnote_summary: [{
+      topic: String,
+      summary: String,
+    }]
+  },
+  esg_analysis: {
+    esg_mentions: [{
+      category: String,
+      statement: String,
+    }]
+  },
+  executive_summary: { type: String },
 });
 
 module.exports = mongoose.model('AnalysisReport', AnalysisReportSchema);

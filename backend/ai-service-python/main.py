@@ -133,7 +133,7 @@ async def get_kpi_analysis(full_text:str):
     If a value cannot be found, use "N/A".
     """
     try:
-        model=genai.GenerativeModel('gemini-1.5-flash-latest',generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        model=genai.GenerativeModel('gemini-1.5-pro-latest',generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
         # clean_text = sanitize_text_for_ai(full_text[:80000])
         response=await model.generate_content_async([prompt,full_text[:150000]])
         return json.loads(response.text)
@@ -152,7 +152,7 @@ You are an expert in financial linguistics. Analyze the tone of the following "M
     Respond ONLY with a JSON object with two keys: "summary" (a one-sentence summary of the tone) and "cautiousness_score" (a score from 1 to 10, where 10 is extremely cautious).
     """
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
         clean_text = sanitize_text_for_ai(mda_text)
         response = await model.generate_content_async([prompt, clean_text])
         return json.loads(response.text)
@@ -169,7 +169,7 @@ async def get_risk_summary(risk_text: str):
 
     """
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
         clean_text = sanitize_text_for_ai(risk_text)
         response = await model.generate_content_async([prompt, clean_text])
         return json.loads(response.text)
@@ -190,7 +190,7 @@ async def get_competitor_analysis(mda_text: str):
     IMPORTANT: Do not use any unicode escape sequences like \\u0024 in your response. Use the actual characters like $.
     """
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
         clean_text = sanitize_text_for_ai(mda_text)
         response = await model.generate_content_async([prompt, clean_text])
         print(json.loads(response.text))
@@ -278,7 +278,124 @@ async def get_financial_statements(financial_statements_text: str):
     except Exception as e:
         print(f"--- ERROR in Financial Statement Deconstruction: {e}")
         return {"income_statement": [], "balance_sheet": [], "cash_flow_statement": []}
-                      
+
+
+async def get_holistic_review(full_text: str):
+    """
+    Performs multiple full-document analyses in a single, efficient AI call.
+    It detects red flags and governance changes simultaneously.
+    """
+    print("--- AI Task: Performing Holistic Review (Red Flags & Governance) ---")
+    prompt = """
+    You are an expert forensic accountant and corporate governance analyst. Your task is to scan the entire provided financial report text for two types of information:
+    
+    1.  **Potential Red Flags:** Your task is to scan the entire provided financial report text for potential anomalies, inconsistencies, or red flags.
+    Focus on subtle issues that might indicate risk, such as:
+    - Unusual or complex accounting changes mentioned in the footnotes.
+    - A significant increase in Accounts Receivable that is growing much faster than revenue.
+    - Mentions of complex off-balance-sheet entities or special purpose vehicles.
+    - Vague, evasive, or overly promotional language in the Management's Discussion section.
+    - Significant, unexplained increases in inventory.
+    - Changes in key auditors or management.
+    2.  **Governance Changes:** Your task is to scan for any mentions of changes to key executive personnel or the board of directors. Look for names of people associated with key roles (e.g., CEO, CFO, COO, Chair of the Board, Director) and keywords like "appointed", "resigned", "retired", "departed", "joined the board".
+
+    Respond ONLY with a single, valid JSON object with two keys: "red_flags" and "governance_changes".
+    Each key should contain an array of strings. Each string should be a concise summary of a single finding.
+    If no items are found for a category, return an empty array for that key.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        clean_text = sanitize_text_for_ai(full_text)
+        response = await model.generate_content_async([prompt, clean_text])
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"--- ERROR in Holistic Review: {e}")
+        return {"red_flags": ["Error detecting red flags."], "governance_changes": ["Error analyzing governance changes."]}
+    
+async def get_deep_qualitative_analysis(full_text: str):
+    """Finds and extracts details about the company's debt schedule and covenants."""
+    print("--- AI Task: Deconstructing Debt & Covenants ---")
+    prompt = """
+    You are an expert financial analyst with specialties in credit and ESG. Your task is to scan the provided financial report text for two types of information:
+    1.  **Debt Schedule & Debt Covenants:** Find the table or section detailing the company's term debt. Extract the maturity year and the principal amount for each future year listed. Find any sentences that describe specific rules or covenants the company must follow related to its debt (e.g., "limit the aggregate amount of secured indebtedness," "consolidated net interest expense ratio cannot be less than 2.20 to 1.0").
+    2. **ESG Mentions:**  Your task is to scan the provided financial report text for any statements related to ESG initiatives or risks.
+    Categorize each finding into one of three categories: 'Environmental', 'Social', or 'Governance'.
+    Examples:
+    - Environmental: Climate change risks, carbon emissions, renewable energy projects.
+    - Social: Employee diversity and inclusion programs, workplace safety, data privacy.
+    - Governance: Board of directors composition, executive compensation policies, shareholder rights.
+
+    Respond ONLY with a single, valid JSON object with two keys: "debt_details" and "esg_analysis".
+    - "debt_details" should be an object with two keys: "debt_schedule" (an array of objects with "year" and "principal_due") and "covenants" (an array of strings).
+    - "esg_analysis" should be an object with one key: "esg_mentions" (an array of objects with "category" and "statement").
+
+    If either type of information is not found, return an empty array for that key.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        # This task requires a large context to find these specific details
+        clean_text = sanitize_text_for_ai(full_text)
+        response = await model.generate_content_async([prompt, clean_text])
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"--- ERROR in Debt Deconstruction: {e}")
+        return {"debt_schedule": [], "covenants": []}
+    
+async def calculate_financial_ratios(financial_statements_json: dict):
+    """Calculates key financial ratios from the structured statement data."""
+    print("--- AI Task: Calculating Financial Ratios ---")
+    prompt = """
+    You are an expert financial analyst. Based on the provided JSON data from a company's financial statements, calculate the following key financial ratios for the 'current_period'.
+    - Gross Margin %
+    - Operating Margin %
+    - Net Profit Margin %
+    - Debt-to-Equity Ratio
+
+    Use the following formulas and be precise:
+    - Gross Margin % = (Gross margin / Total net sales) * 100
+    - Operating Margin % = (Operating income / Total net sales) * 100
+    - Net Profit Margin % = (Net income / Total net sales) * 100
+    - Debt-to-Equity Ratio = (Total liabilities / Total shareholders' equity)
+
+    Extract the necessary numbers from the 'income_statement' and 'balance_sheet' arrays in the provided JSON. The numbers are strings with commas, which you must parse correctly.
+    Present the results as percentages rounded to two decimal places, or as a ratio rounded to two decimal places for Debt-to-Equity.
+
+    Respond ONLY with a single, valid JSON object with one key: "ratios".
+    The value should be an array of objects, where each object has two keys: "name" (the ratio's name) and "value" (the calculated string value, e.g., "44.12%", "1.52").
+
+    If you cannot calculate a ratio because a specific line item is missing, omit it from the final array.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        # Convert the dict to a JSON string to send to the model
+        json_input = json.dumps(financial_statements_json)
+        response = await model.generate_content_async([prompt, json_input])
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"--- ERROR in Ratio Analysis: {e}")
+        return {"ratios": []}
+async def summarize_footnotes(footnotes_text: str):
+    """Creates a summarized index of the key topics in the financial footnotes."""
+    print("--- AI Task: Summarizing Financial Footnotes ---")
+    prompt = """
+    You are a senior auditor. The following text contains the "Notes to Consolidated Financial Statements" from a financial report.
+    Your task is to read this entire section and create a summarized index of the key topics discussed.
+    For each major topic (e.g., "Note 1 - Summary of Significant Accounting Policies", "Note 4 - Financial Instruments", "Note 9 - Debt"), provide a concise, one or two-sentence summary of the most important information in that note.
+
+    Respond ONLY with a single, valid JSON object with one key: "footnote_summary".
+    The value should be an array of objects, where each object has two keys: "topic" (the name of the note, e.g., "Note 9 - Debt") and "summary" (your concise summary).
+    
+    If the provided text is empty or does not contain footnotes, return an empty array.
+    """
+    try:
+        model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        clean_text = sanitize_text_for_ai(footnotes_text)
+        response = await model.generate_content_async([prompt, clean_text])
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"--- ERROR in Footnote Summarization: {e}")
+        return {"footnote_summary": []}
+    
 @app.get("/")
 def read_root():
     return {"message": "AI Service is running"}
@@ -310,6 +427,7 @@ async def analyze_report(file: UploadFile = File(...)):
             risk_end = r"Item\s+1\s*B\s*\."
             risk_factors_text = extract_last_match_section(full_text, risk_start, risk_end)
             financial_statements_text = extract_last_match_section(full_text, r"Item\s+8\s*\..*?Financial\s+Statements\s+and\s+Supplementary\s+Data", r"Item\s+9\s*\.")
+            footnotes_text = extract_last_match_section(financial_statements_text, r"Notes\s+to\s+Consolidated\s+Financial\s+Statements", r"Item\s+9\s*\.")
 
             mda_start = r"Item\s+7\s*\..*?Management['’]?s\s+Discussion"
             mda_end = r"Item\s+(?:7A|8)\s*\."
@@ -341,6 +459,8 @@ async def analyze_report(file: UploadFile = File(...)):
             risk_factors_text = extract_last_match_section(full_text, risk_start_10q, risk_end_10q)
 
             financial_statements_text = extract_10q_mda_section(report_body_text, r"Item\s+1\s*\..*?Financial\s+Statements", r"Item\s+2\s*\.")
+            footnotes_text = extract_last_match_section(financial_statements_text, r"Notes\s+to\s+Consolidated\s+Financial\s+Statements", r"Item\s+2\s*\.")
+
 
         
         print(f"--- Parsing Complete: Found {len(risk_factors_text)} risk chars, {len(mda_text)} MDA chars.")
@@ -372,14 +492,29 @@ async def analyze_report(file: UploadFile = File(...)):
         await asyncio.sleep(15)
         financial_statements_results = await get_financial_statements(financial_statements_text) if financial_statements_text else {"income_statement": [], "balance_sheet": [], "cash_flow_statement": []}
 
+        await asyncio.sleep(15)
+        holistic_review_results = await get_holistic_review(full_text)
+
+        await asyncio.sleep(15)
+        ratio_results = await calculate_financial_ratios(financial_statements_results) if financial_statements_results else {}
+
+        await asyncio.sleep(15)
+        deep_qualitative_results = await get_deep_qualitative_analysis(full_text)
+
+        await asyncio.sleep(15)
+        footnote_results = await summarize_footnotes(footnotes_text) if footnotes_text else {}
 
         print("--- AI Analysis Complete ---")
 
         print(competitor_results)
         print(legal_results)
         print(guidance_results)
+        print(holistic_review_results.get('red_flags'))
+        print(holistic_review_results.get('governance_changes'))
+        print(ratio_results)
+        print(deep_qualitative_results.get('debt_details'))
+        print(deep_qualitative_results.get('esg_analysis'))
 
-        
         return {
             "filename": file.filename,
             "key_metrics": kpi_results,
@@ -391,6 +526,12 @@ async def analyze_report(file: UploadFile = File(...)):
             "legal_summary": legal_results,
             "guidance_analysis": guidance_results, 
             "financial_statements": financial_statements_results,
+            "red_flags": holistic_review_results.get("red_flags", []),
+            "governance_changes": holistic_review_results.get("governance_changes",[]),
+            "financial_ratios": ratio_results, 
+            "debt_details": deep_qualitative_results.get("debt_details", {}),
+            "esg_analysis": deep_qualitative_results.get("esg_analysis", {}),
+            "footnote_summary": footnote_results, # New field
         }
 
     except Exception as e:

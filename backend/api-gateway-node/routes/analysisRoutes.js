@@ -4,5 +4,6 @@ const router = express.Router();
 
 router.post('/analyze', analysisController.upload, analysisController.analyzeReport);
 
+router.get('/history/:filename',analysisController.getAnalysisHistory);
 
 module.exports = router;

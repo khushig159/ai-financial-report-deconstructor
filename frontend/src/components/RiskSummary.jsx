@@ -1,8 +1,9 @@
 import React from 'react';
-import { Paper, Typography, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Paper, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import RedFlagDisplay from './RedFlagDisplay';
 
-function RiskSummary({ data }) {
+function RiskSummary({ data,redFlagsData  }) {
   if (!data || !data.top_risks || data.top_risks[0] === 'N/A') {
     return <Typography>No risk summary data available.</Typography>;
   }
@@ -22,6 +23,9 @@ function RiskSummary({ data }) {
           </ListItem>
         ))}
       </List>
+
+      <Divider sc={{my:3}}/>
+      <RedFlagDisplay data={redFlagsData}/>
     </Paper>
   );
 }
