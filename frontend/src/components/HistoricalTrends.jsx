@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, Paper, Typography, CircularProgress, Alert,Grid } from '@mui/material';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -36,7 +36,8 @@ function HistoricalTrends({ filename }) {
           const formattedData = response.data.map(report => ({
             date: formatDate(report.uploadDate),
             Revenue: parseFinancialValue(report.key_metrics.revenue),
-            'Net Income': parseFinancialValue(report.key_metrics.netIncome)
+            'Net Income': parseFinancialValue(report.key_metrics.netIncome),
+            'Cautiousness Score': report.management_tone.cautiousness_score,
           })).reverse(); // Reverse to show oldest to newest
 
           setHistory(formattedData);
@@ -69,30 +70,47 @@ function HistoricalTrends({ filename }) {
       <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
         Historical Trend Analysis for: {filename}
       </Typography>
-      <Paper sx={{ p: 2, mt: 3, backgroundColor: '#2a2a2a' }}>
-        <Typography variant="h6" gutterBottom sx={{ ml: 2, mt: 1 }}>
-          Revenue & Net Income (in Millions)
-        </Typography>
-        <Box sx={{ height: 400 }}>
-            <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                    data={history}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                    <XAxis dataKey="date" tick={{ fill: '#ccc' }} />
-                    <YAxis tick={{ fill: '#ccc' }} />
-                    <Tooltip 
-                        contentStyle={{ backgroundColor: '#333', border: '1px solid #555' }} 
-                        labelStyle={{ color: '#fff' }}
-                    />
-                    <Legend wrapperStyle={{ color: '#ccc' }} />
-                    <Line type="monotone" dataKey="Revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
-                    <Line type="monotone" dataKey="Net Income" stroke="#82ca9d" />
-                </LineChart>
-            </ResponsiveContainer>
-        </Box>
-      </Paper>
+      
+      <Grid container spacing={4}>
+        {/* Financial Trends Chart */}
+        <Grid item xs={12} lg={6}>
+            <Paper sx={{ p: 2, backgroundColor: '#2a2a2a', height: 400 }}>
+                <Typography variant="h6" gutterBottom sx={{ ml: 2, mt: 1 }}>
+                Revenue & Net Income (in Millions)
+                </Typography>
+                <ResponsiveContainer width="100%" height="90%">
+                    <LineChart data={history} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                        <XAxis dataKey="date" tick={{ fill: '#ccc' }} />
+                        <YAxis tick={{ fill: '#ccc' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#333', border: '1px solid #555' }} />
+                        <Legend wrapperStyle={{ color: '#ccc' }} />
+                        <Line type="monotone" dataKey="Revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
+                        <Line type="monotone" dataKey="Net Income" stroke="#82ca9d" />
+                    </LineChart>
+                </ResponsiveContainer>
+            </Paper>
+        </Grid>
+
+        {/* --- NEW: Sentiment Trend Chart --- */}
+        <Grid item xs={12} lg={6}>
+            <Paper sx={{ p: 2, backgroundColor: '#2a2a2a', height: 400 }}>
+                <Typography variant="h6" gutterBottom sx={{ ml: 2, mt: 1 }}>
+                Management Tone Over Time
+                </Typography>
+                <ResponsiveContainer width="100%" height="90%">
+                    <LineChart data={history} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                        <XAxis dataKey="date" tick={{ fill: '#ccc' }} />
+                        <YAxis domain={[0, 10]} tick={{ fill: '#ccc' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#333', border: '1px solid #555' }} />
+                        <Legend wrapperStyle={{ color: '#ccc' }} />
+                        <Line type="monotone" dataKey="Cautiousness Score" stroke="#ff9800" activeDot={{ r: 8 }} />
+                    </LineChart>
+                </ResponsiveContainer>
+            </Paper>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

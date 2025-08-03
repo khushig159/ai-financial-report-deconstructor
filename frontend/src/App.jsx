@@ -276,7 +276,7 @@ function App() {
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
                 >
-                 <FinancialStatements data={analysisResult.financial_statements}/>
+                 <FinancialStatements data={analysisResult.financial_statements} filename={analysisResult.filename}/>
                 </Typography>
               </TabPanel>
               <TabPanel value={tabValue} index={3}>
@@ -372,7 +372,7 @@ function App() {
                   <EsgAnalysis data={analysisResult.esg_analysis} />
                 </Typography>
               </TabPanel>
-              <TabPanel value={tabValue} index={13}>
+              <TabPanel value={tabValue} index={14}>
                 <Typography
                   component="pre"
                   sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
