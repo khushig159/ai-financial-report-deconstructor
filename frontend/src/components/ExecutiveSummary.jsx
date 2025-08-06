@@ -1,11 +1,13 @@
 import React from 'react';
-import { Paper, Typography, Box } from '@mui/material';
+import { Paper, Typography, Box ,List,ListItem,ListItemIcon,ListItemText} from '@mui/material';
 import InsightsIcon from '@mui/icons-material/Insights';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 
 function ExecutiveSummary({ data }) {
   const summary = data?.executive_summary;
 
-  if (!summary || summary.includes("Failed to generate")) {
+  if (!summary) {
     return (
       <Paper sx={{ p: 3, backgroundColor: '#2a2a2a' }}>
         <Typography variant="h6" gutterBottom>
@@ -27,8 +29,25 @@ function ExecutiveSummary({ data }) {
         </Typography>
       </Box>
       <Typography variant="body1" paragraph sx={{ lineHeight: 1.7, color: 'text.secondary' }}>
-        {summary}
+        {summary.paragraph}
       </Typography>
+      {summary.takeaways && summary.takeaways.length > 0 && (
+        <Box>
+          <Typography variant="h6" gutterBottom>
+            Key Takeaways
+          </Typography>
+          <List>
+            {summary.takeaways.map((item, index) => (
+              <ListItem key={index}>
+                <ListItemIcon>
+                  <CheckCircleIcon color="success" />
+                </ListItemIcon>
+                <ListItemText primary={item} />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      )}
     </Paper>
   );
 }

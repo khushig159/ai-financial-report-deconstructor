@@ -1,7 +1,7 @@
 import React,{useEffect,useState} from 'react';
-import axios from 'axios'
+// import axios from 'axios'
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid,ResponsiveContainer } from 'recharts';
-import { Alert } from '@mui/material';
+// import { Alert } from '@mui/material';
 import {
   Box, Paper, Typography, Accordion, AccordionSummary, AccordionDetails,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,CircularProgress
@@ -54,33 +54,51 @@ const StatementTable = ({ title, data ,onRowClick}) => {
   );
 };
 
-function FinancialStatements({ data ,filename}) {
+function FinancialStatements({ data ,analysisResult}) {
   const [history,setHistory]=useState([])
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [error, setError] = useState(null);
+  // const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  // const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [chartData, setChartData] = useState([]);
-
+ console.log(analysisResult)
   useEffect(()=>{
-    if (filename){
-      console.log(filename)
-      const fetchHistory=async()=>{
-        setIsLoadingHistory(true)
-        try{
-          const response = await axios.get(`http://localhost:5000/api/history/${filename}`);
-          setHistory(response.data) 
-          console.log(history)
-        }
-        catch(err){
-          setError(`Failed to fetch historical data for trend analysis. ${err}`);
-        }
-        finally{
-          setIsLoadingHistory(false)
-        }
-      }
-      fetchHistory()
+    if (analysisResult){
+          const history = [];
+      // console.log(analysisResult)
+      // const fetchHistory=async()=>{
+      //   setIsLoadingHistory(true)
+      //   try{
+      //     const response = await axios.get(`http://localhost:5000/api/history/${filename}`);
+      //     setHistory(response.data) 
+      //     console.log(history)
+      //   }
+      //   catch(err){
+      //     setError(`Failed to fetch historical data for trend analysis. ${err}`);
+      //   }
+      //   finally{
+      //     setIsLoadingHistory(false)
+      //   }
+      // }
+      // fetchHistory()
+     
+
+    if (analysisResult.financial_statements) {
+      history.push({
+        uploadDate: "Current Report",
+        financial_statements: analysisResult.financial_statements,
+      });
     }
-  },[filename])
+     if (analysisResult.previous_financial_statements) {
+      history.push({
+        uploadDate: "Previous Report",
+        financial_statements: analysisResult.previous_financial_statements,
+      });
+    }
+
+    setHistory(history);
+    }
+  },[analysisResult])
+  console.log(history)
 
   const handleRowClick=(itemName,statementType)=>{
     setSelectedItem(itemName)
@@ -97,7 +115,7 @@ const statementKey = statementType.toLowerCase().replace(/\s+/g, '_');
       if (!itemData) return null;
 
       return {
-        data:formatDate(report.uploadDate),
+        label:report.uploadDate,
         value:parseFinancialValue(itemData.current_period)
       }
     }).filter(Boolean).reverse();
@@ -159,12 +177,12 @@ const statementKey = statementType.toLowerCase().replace(/\s+/g, '_');
           <Typography variant="h6" gutterBottom sx={{ ml: 2, mt: 1 }}>
             Historical Trend for: {selectedItem}
           </Typography>
-          {isLoadingHistory ? <CircularProgress /> : error ? <Alert severity="error">{error}</Alert> : (
+          {/* {isLoadingHistory ? <CircularProgress /> : error ? <Alert severity="error">{error}</Alert> : ( */}
             <Box sx={{ height: 300 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                  <XAxis dataKey="data" tick={{ fill: '#ccc' }} />
+                  <XAxis dataKey="label" tick={{ fill: '#ccc' }} />
                   <YAxis tick={{ fill: '#ccc' }} />
                   <Tooltip contentStyle={{ backgroundColor: '#333', border: '1px solid #555' }} />
                   <Legend wrapperStyle={{ color: '#ccc' }} />
@@ -172,7 +190,7 @@ const statementKey = statementType.toLowerCase().replace(/\s+/g, '_');
                 </LineChart>
               </ResponsiveContainer>
             </Box>
-          )}
+          {/* )} */}
         </Paper>
       )}
     </Box>

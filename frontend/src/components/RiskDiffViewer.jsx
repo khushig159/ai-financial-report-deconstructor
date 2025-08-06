@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer';
-import { Box, Typography, Paper, List, ListItem, ListItemIcon, ListItemText, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Typography, Paper, List, ListItem, ListItemIcon, ListItemText, useTheme, useMediaQuery,Divider } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ChangeHistoryIcon from '@mui/icons-material/ChangeHistory';
+import RiskWordCloud from './RiskWordCloud';
 
-function RiskDiffViewer({ oldText, newText, comparisonSummary }) {
-  // --- THE CRITICAL FIX FOR RESPONSIVENESS ---
+function RiskDiffViewer({ oldText, newText, comparisonSummary,wordCloudData }) {
   const theme = useTheme();
   // This hook returns 'true' if the screen width is medium (md) or larger.
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
@@ -48,7 +48,9 @@ function RiskDiffViewer({ oldText, newText, comparisonSummary }) {
           </List>
         )}
       </Paper>
-
+      <Paper sx={{ p: 2, mb: 3, backgroundColor: '#2a2a2a' }}>
+        <RiskWordCloud data={wordCloudData} />
+      </Paper>
       {/* Raw Diff Viewer Section (Now Responsive) */}
       <Typography variant="h6" gutterBottom>
         Detailed Side-by-Side View

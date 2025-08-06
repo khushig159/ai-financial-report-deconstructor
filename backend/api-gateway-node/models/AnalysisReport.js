@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from "mongoose";
 const StatementItemSchema = new mongoose.Schema({
   item: String,
   current_period: String,
@@ -9,6 +8,7 @@ const StatementItemSchema = new mongoose.Schema({
 const AnalysisReportSchema = new mongoose.Schema({
   filename: { type: String, required: true },
   uploadDate: { type: Date, default: Date.now },
+  userId: { type: String, required: true, index: true },
   key_metrics: {
     revenue: String,
     netIncome: String,
@@ -18,13 +18,18 @@ const AnalysisReportSchema = new mongoose.Schema({
     summary: String,
     cautiousness_score: Number,
   },
+  companyTicker: { type: String, required: true, index: true },
   risk_summary: {
     top_risks: [String]
   },
-  // --- THE CRITICAL FIX IS HERE ---
-  // It is now correctly defined to accept an object containing an array of strings.
   risk_comparison: {
     comparison_summary: [String]
+  },
+  risk_wordcloud: {
+      wordcloud_data: [{
+          text: String,
+          value: Number,
+      }]
   },
   raw_risk_factors: { type: String },
   previous_raw_risk_factors: { type: String },
@@ -81,7 +86,11 @@ const AnalysisReportSchema = new mongoose.Schema({
       statement: String,
     }]
   },
-  executive_summary: { type: String },
+  executive_summary: {
+    paragraph: String,
+    takeaways: [String]
+  },
 });
 
-module.exports = mongoose.model('AnalysisReport', AnalysisReportSchema);
+const AnalysisReport = mongoose.model('AnalysisReport', AnalysisReportSchema);
+export default AnalysisReport;

@@ -1,9 +1,12 @@
-const express = require('express');
-const analysisController=require('../controllers/analysercontroller')
+import express from 'express';
 const router = express.Router();
+import { upload, analyzeReport, getAnalysisHistory,explainChart } from '../controllers/analysercontroller.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
-router.post('/analyze', analysisController.upload, analysisController.analyzeReport);
+router.post('/analyze', verifyToken, upload, analyzeReport);
 
-router.get('/history/:filename',analysisController.getAnalysisHistory);
+router.get('/history/:ticker', verifyToken,getAnalysisHistory);
 
-module.exports = router;
+router.post('/explain',verifyToken,explainChart)
+
+export default router;

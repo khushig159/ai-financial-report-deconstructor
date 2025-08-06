@@ -1,13 +1,14 @@
-const multer = require('multer');
-const axios = require('axios');
-const FormData = require('form-data');
-const AnalysisReport = require('../models/AnalysisReport');
-const {GoogleGenerativeAI}=require('@google/generative-ai')
-
-const genAI=new GoogleGenerativeAI(process.env.GOOGLE_API_KEY)
+import multer from 'multer';
+import FormData from 'form-data';
+import { config } from 'dotenv';
+config();
+import AnalysisReport from '../models/AnalysisReport.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY)
+import axios from 'axios'
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage }).fields([
+export const upload = multer({ storage: storage }).fields([
     { name: 'currentReport', maxCount: 1 },
     { name: 'previousReport', maxCount: 1 }
 ]);
@@ -34,9 +35,15 @@ const getRiskComparison = async (previous_risk_text, current_risk_text) => {
     You are an expert financial compliance officer. Compare the "Risk Factors" from two consecutive reports.
     PREVIOUS: "${previous_risk_text}"
     CURRENT: "${current_risk_text}"
-    Summarize the meaningful, substantive changes (new risks, removed risks, or significantly altered language).
-    Respond ONLY with a single JSON object with one key: "comparison_summary", which is an array of strings.
-    If there are no meaningful changes, return an empty array.
+    1.  **Comparison Summary:**Summarize the meaningful, substantive changes (new risks, removed risks, or significantly altered language).
+    2.  **Word Cloud Data:** You are a risk analyst. Read the following "Risk Factors" text and identify the 30 most important and frequently mentioned keywords or two-word phrases.
+    Ignore common words like "company", "business", "risk", "factors", "may", "could". Focus on specific risk topics like "intense competition", "supply chain", "cybersecurity", "government regulation", "economic conditions", etc.
+
+    Respond ONLY with a single JSON object with two keys:
+    - "comparison_summary": An array of strings, where each string is a summary of a single meaningful change.
+    - "wordcloud_data": An array of objects, where each object has "text" and "value" (a score from 10-100) keys.
+
+    If no changes are found for a task, return an empty array for that key.
     `;
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -68,13 +75,18 @@ const generateExecutiveSummary = async (analysisData) => {
     Start with a clear statement on the overall health and outlook (e.g., "The company presents a strong but cautious outlook...").
     Then, touch upon the key financial performance, the management's tone, the most critical risks, and any significant strategic or governance factors.
 
+    Your response must be a single, valid JSON object with two keys:
+    1. "paragraph": A concise, one-paragraph executive summary for a busy executive. Weave the data points into an insightful narrative.
+    2. "takeaways": An array of 3 to 4 key bullet points. Each bullet point should be a string and represent the most critical, "at-a-glance" insights from the data.
+
     Synthesized Data:
     ${summaryInput}
     `;
     try {
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        return response.text();
+        const text = response.text().replace('```json', '').replace('```', '');
+        return JSON.parse(text);
     } catch (error) {
         console.error("--- ERROR in Executive Summary generation:", error);
         return "Failed to generate executive summary.";
@@ -111,11 +123,12 @@ const getIndustryBenchmarks = async (ratios) => {
 };
 
 
-exports.analyzeReport = async (req, res) => {
+export const analyzeReport = async (req, res) => {
     try {
         console.log('--- analyzeReport function has started ---');
+        const userId = req.user.uid;
+        const { companyTicker } = req.body;
 
-        // --- DETAILED DEBUGGING LOGS ---
         // console.log('--- Checking req.files object ---');
         // console.log('Is req.files present?', !!req.files);
         // if (req.files) {
@@ -124,64 +137,110 @@ exports.analyzeReport = async (req, res) => {
         //     // Log the entire req.files object to see its structure
         //     console.log('Full req.files object:', JSON.stringify(req.files, null, 2));
         // }
-        // --- END OF DEBUGGING LOGS ---
 
-        if (!req.files || !req.files.currentReport || !req.files.previousReport) {
-            console.log('--- ERROR: File check failed. One or more files are missing. ---');
-            return res.status(400).json({ message: "File check failed. Please ensure both files are uploaded correctly." });
+        // if (!req.files || !req.files.currentReport ) {
+        //     console.log('--- ERROR: File check failed. One or more files are missing. ---');
+        //     return res.status(400).json({ message: "File check failed. Please ensure both files are uploaded correctly." });
+        // }
+        if (!companyTicker) {
+            return res.status(400).json({ message: "Company ticker is required." });
         }
 
         // console.log('--- File check passed. Proceeding with analysis. ---');
 
         const currentReportFile = req.files.currentReport[0];
-        const previousReportFile = req.files.previousReport[0];
+        const previousReportFile = req.files.previousReport ? req.files.previousReport[0] : null;
 
-        console.log("Step 1: Analyzing current report...");
+        console.log(`Starting analysis for ticker: ${companyTicker}, user: ${userId}`);
+
         const currentAnalysis = await analyzeFile(currentReportFile);
+        let previousAnalysis = null;
+
         console.log("Step 1 Complete. Current report analysis finished.");
 
-        console.log("Step 2: Analyzing previous report...");
-        const previousAnalysis = await analyzeFile(previousReportFile);
-        console.log("Step 2 Complete. Previous report analysis finished.");
-        
-        if (!currentAnalysis || !previousAnalysis) {
-            throw new Error("Failed to get analysis from Python service for one or both files.");
+        if (previousReportFile) {
+            console.log("Step 2: Analyzing previous report...");
+            previousAnalysis = await analyzeFile(previousReportFile);
         }
-        
+        else {
+            previousAnalysis = await AnalysisReport.findOne({ companyTicker: companyTicker, userId: userId, }).sort({ uploadDate: -1 })
+
+            if (previousAnalysis) {
+                console.log(`Found previous report in DB: ${previousAnalysis.filename}`);
+            } else {
+                console.log("No previous reports found in DB for this ticker.");
+            }
+        }
+
+        console.log("Step 2 Complete. Previous report analysis finished.");
+
+        if (!currentAnalysis) {
+            throw new Error("Failed to get analysis from Python service for the current file.");
+        }
+
         console.log("Received analysis for both files. Assembling final report.");
 
-        const riskComparison=await getRiskComparison(
-            previousAnalysis.raw_risk_factors,
-            currentAnalysis.raw_risk_factors
-        )
+        let riskAnalysisSuiteResults = null;
+
+if (previousAnalysis && previousAnalysis.raw_risk_factors) {
+    riskAnalysisSuiteResults = await getRiskComparison(
+        previousAnalysis.raw_risk_factors,
+        currentAnalysis.raw_risk_factors
+    );
+    console.log(riskAnalysisSuiteResults)
+} else {
+    console.warn("No previous analysis available for risk comparison.");
+    riskAnalysisSuiteResults = {
+        comparison_summary: "No previous report available for comparison.",
+        wordcloud_data: []
+    };
+}
+        console.log(riskAnalysisSuiteResults)
 
         const executiveSummary = await generateExecutiveSummary(currentAnalysis);
         console.log(executiveSummary)
 
-        const industryBenchmarks =await getIndustryBenchmarks(currentAnalysis.financial_ratios);
+        const industryBenchmarks = await getIndustryBenchmarks(currentAnalysis.financial_ratios);
         console.log(industryBenchmarks)
 
         const finalReport = {
+            userId: userId,
+            companyTicker: companyTicker,
             filename: currentReportFile.originalname,
             key_metrics: currentAnalysis.key_metrics,
-            risk_comparison:riskComparison,
+            risk_comparison: { comparison_summary: riskAnalysisSuiteResults.comparison_summary },
+            risk_wordcloud: { wordcloud_data: riskAnalysisSuiteResults.wordcloud_data }, 
             management_tone: currentAnalysis.management_tone,
             risk_summary: currentAnalysis.risk_summary,
             raw_risk_factors: currentAnalysis.raw_risk_factors,
-            competitor_analysis: currentAnalysis.competitor_analysis, 
-            previous_raw_risk_factors: previousAnalysis.raw_risk_factors,
+            competitor_analysis: currentAnalysis.competitor_analysis,
             raw_management_discussion: currentAnalysis.raw_management_discussion,
-            legal_summary:currentAnalysis.legal_summary,
-            guidance_analysis:currentAnalysis.guidance_analysis,
-            financial_statements:currentAnalysis.financial_statements,
-            governance_changes:currentAnalysis.governance_changes,
-            red_flags:currentAnalysis.red_flags,
-            executive_summary:executiveSummary,
-            financial_ratios:currentAnalysis.financial_ratios,
+            legal_summary: currentAnalysis.legal_summary,
+            guidance_analysis: currentAnalysis.guidance_analysis,
+            financial_statements: currentAnalysis.financial_statements,
+            governance_changes: currentAnalysis.governance_changes,
+            red_flags: currentAnalysis.red_flags,
+            executive_summary: executiveSummary,
+            financial_ratios: currentAnalysis.financial_ratios,
             industry_benchmarks: industryBenchmarks,
-            debt_details:currentAnalysis.debt_details,
+            debt_details: currentAnalysis.debt_details,
             esg_analysis: currentAnalysis.esg_analysis,
             footnote_summary: currentAnalysis.footnote_summary,
+            previous_raw_risk_factors: previousAnalysis?.raw_risk_factors || null,
+    previous_key_metrics: previousAnalysis?.key_metrics || null,
+    previous_management_tone: previousAnalysis?.management_tone || null,
+    previous_risk_summary: previousAnalysis?.risk_summary || null,
+    previous_competitor_analysis: previousAnalysis?.competitor_analysis || null,
+    previous_raw_management_discussion: previousAnalysis?.raw_management_discussion || null,
+    previous_legal_summary: previousAnalysis?.legal_summary || null,
+    previous_guidance_analysis: previousAnalysis?.guidance_analysis || null,
+    previous_financial_statements: previousAnalysis?.financial_statements || null,
+    previous_governance_changes: previousAnalysis?.governance_changes || null,
+    previous_red_flags: previousAnalysis?.red_flags || null,
+    previous_financial_ratios: previousAnalysis?.financial_ratios || null,
+    previous_debt_details: previousAnalysis?.debt_details || null,
+    previous_esg_analysis: previousAnalysis?.esg_analysis || null,
+    previous_footnote_summary: previousAnalysis?.footnote_summary || null,
         };
 
 
@@ -198,29 +257,63 @@ exports.analyzeReport = async (req, res) => {
         console.error("Error in orchestration logic:", error.message);
         if (error.response) {
             console.error("Error details from Python service:", error.response.data);
-            return res.status(500).json({ 
+            return res.status(500).json({
                 message: "An error occurred during analysis in the Python service.",
-                details: error.response.data 
+                details: error.response.data
             });
         }
         res.status(500).json({ message: "An internal server error occurred." });
     }
 };
 
-exports.getAnalysisHistory=async(req,res)=>{
-    try{
-        const filename=req.params.filename;
-        console.log(`Fetching history for filename:${filename}`)
-        const reports=await AnalysisReport.find({filename:filename}).sort({uploadDate:-1});
-
-        if(!reports || reports.length===0){
-            return res.status(404).json({ message: "No historical data found for this file." });
+export const getAnalysisHistory = async (req, res) => {
+    try {
+        const userId = req.user.uid;
+        const ticker = req.params.ticker;
+        console.log(`Fetching history for user: ${userId}, ticker: ${ticker}`);
+        const reports = await AnalysisReport.find({ userId: userId, companyTicker: ticker }).sort({ uploadDate: -1 });
+        // const reports = []; 
+        if (!reports || reports.length === 0) {
+            return res.status(404).json({ message: "No historical data found for this ticker." });
         }
         res.status(200).json(reports)
     }
-    catch(error){
-        console.error("Error fetching analysis history:", error); 
+    catch (error) {
+        console.error("Error fetching analysis history:", error);
         res.status(500).json({ message: "An internal server error occurred while fetching history." });
     }
 }
-exports.upload = upload;
+// const { ticker } = req.params; // We will use this on Day 10
+export const explainChart = async (req, res) => {
+    try {
+        const { chartTitle, chartData, context } = req.body;
+
+        if (!chartTitle || !chartData || !context) {
+            return res.status(400).json({ message: "Chart title, data, and context are required." });
+        }
+
+        console.log(`--- AI Task (Node.js): Explaining chart: ${chartTitle} ---`);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+
+        const prompt = `
+        You are a senior financial analyst briefing a portfolio manager.
+        A junior analyst has generated a chart with the title "${chartTitle}".
+        The data for the chart is: ${JSON.stringify(chartData)}.
+        The broader context from the financial report is: "${context.substring(0, 2000)}..."
+
+        Your task is to provide a concise, insightful, one or two-sentence explanation of what this chart shows and why it is significant for an investor.
+        Do not just state the obvious. Provide a brief analysis.
+        For example, if revenue is up, explain if this is due to strong sales or a new product launch mentioned in the context.
+        `;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const explanation = response.text();
+
+        res.status(200).json({ explanation: explanation });
+
+    } catch (error) {
+        console.error("Error in explainChart function:", error.message);
+        res.status(500).json({ message: "Failed to generate explanation." });
+    }
+};

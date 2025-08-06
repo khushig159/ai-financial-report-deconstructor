@@ -1,29 +1,77 @@
-import React from 'react';
+import React, { useState } from "react";
 import {
-  Box, Paper, Typography, List, ListItem, ListItemIcon, ListItemText,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Divider
-} from '@mui/material';
-import GavelIcon from '@mui/icons-material/Gavel';
+  Box,
+  Paper,
+  Typography,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Divider,
+} from "@mui/material";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import GavelIcon from "@mui/icons-material/Gavel";
+import ExplainChartModal from "./ExplainChartModal";
 
-function DebtSchedule({ data }) {
+const parseDebtValue = (value) => {
+  if (value === null || value === undefined) return 0;
+
+  if (typeof value === "number") return value;
+
+  if (typeof value === "string") {
+    const numberPart = parseFloat(value.replace(/[$,a-zA-Z]/g, ""));
+    return isNaN(numberPart) ? 0 : numberPart;
+  }
+
+  return 0;
+};
+
+function DebtSchedule({ data, context }) {
+  const [modalOpen, setModalOpen] = useState(false);
   const schedule = data?.debt_schedule;
   const covenants = data?.covenants;
+  console.log(schedule);
 
   const hasSchedule = schedule && schedule.length > 0;
   const hasCovenants = covenants && covenants.length > 0;
 
   if (!hasSchedule || !hasCovenants) {
     return (
-      <Paper sx={{ p: 3, backgroundColor: '#2a2a2a' }}>
+      <Paper sx={{ p: 3, backgroundColor: "#2a2a2a" }}>
         <Typography variant="h6" gutterBottom>
           Debt & Covenants
         </Typography>
         <Typography>
-          No specific debt schedule or covenant information was extracted from this report.
+          No specific debt schedule or covenant information was extracted from
+          this report.
         </Typography>
       </Paper>
     );
   }
+  const chartData = hasSchedule
+    ? schedule
+        .filter((item) => item.principal_due !== null)
+        .map((item) => ({
+          name: item.year,
+          "Principal Due (in Millions)": parseDebtValue(item.principal_due),
+        }))
+    : [];
+  console.log(chartData);
 
   return (
     <Box>
@@ -32,33 +80,51 @@ function DebtSchedule({ data }) {
       </Typography>
 
       {hasSchedule && (
-        <Paper sx={{ p: 2, backgroundColor: '#2a2a2a', mb: 3 }}>
-          <Typography variant="h6" gutterBottom sx={{ p: 2 }}>
-            Future Principal Payments
-          </Typography>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Maturity Year</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>Principal Due</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {schedule.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{row.year}</TableCell>
-                    <TableCell align="right">{row.principal_due}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <Paper sx={{ p: 2, backgroundColor: "#2a2a2a", mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" gutterBottom sx={{ p: 2 }}>
+              Debt Maturity Schedule
+            </Typography>
+            <Button
+              startIcon={<HelpOutlineIcon />}
+              onClick={() => setModalOpen(true)}
+              size="small"
+            >
+              Explain this Chart
+            </Button>
+          </Box>
+          <Box sx={{ height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={chartData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis dataKey="name" tick={{ fill: "#ccc" }} />
+                <YAxis tick={{ fill: "#ccc" }} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#333",
+                    border: "1px solid #555",
+                  }}
+                  labelStyle={{ color: "#fff" }}
+                />
+                <Legend wrapperStyle={{ color: "#ccc" }} />
+                <Bar dataKey="Principal Due (in Millions)" fill="#f44336" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
         </Paper>
       )}
 
       {hasCovenants && (
-        <Paper sx={{ p: 2, backgroundColor: '#2a2a2a' }}>
+        <Paper sx={{ p: 2, backgroundColor: "#2a2a2a" }}>
           <Typography variant="h6" gutterBottom sx={{ p: 2 }}>
             Identified Debt Covenants
           </Typography>
@@ -74,6 +140,13 @@ function DebtSchedule({ data }) {
           </List>
         </Paper>
       )}
+      <ExplainChartModal
+        open={modalOpen}
+        handleClose={() => setModalOpen(false)}
+        chartTitle="Debt Maturity Schedule"
+        chartData={chartData}
+        context={context}
+      />
     </Box>
   );
 }

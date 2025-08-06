@@ -318,12 +318,13 @@ async def get_deep_qualitative_analysis(full_text: str):
     prompt = """
     You are an expert financial analyst with specialties in credit and ESG. Your task is to scan the provided financial report text for two types of information:
     1.  **Debt Schedule & Debt Covenants:** Find the table or section detailing the company's term debt. Extract the maturity year and the principal amount for each future year listed. Find any sentences that describe specific rules or covenants the company must follow related to its debt (e.g., "limit the aggregate amount of secured indebtedness," "consolidated net interest expense ratio cannot be less than 2.20 to 1.0").
-    2. **ESG Mentions:**  Your task is to scan the provided financial report text for any statements related to ESG initiatives or risks.
+    2. **ESG Mentions:**  Your task is to carefully scan the provided financial report text for any statements related to ESG initiatives or risks.
     Categorize each finding into one of three categories: 'Environmental', 'Social', or 'Governance'.
     Examples:
     - Environmental: Climate change risks, carbon emissions, renewable energy projects.
     - Social: Employee diversity and inclusion programs, workplace safety, data privacy.
     - Governance: Board of directors composition, executive compensation policies, shareholder rights.
+    The esg analysis is important so please look carefully 
 
     Respond ONLY with a single, valid JSON object with two keys: "debt_details" and "esg_analysis".
     - "debt_details" should be an object with two keys: "debt_schedule" (an array of objects with "year" and "principal_due") and "covenants" (an array of strings).

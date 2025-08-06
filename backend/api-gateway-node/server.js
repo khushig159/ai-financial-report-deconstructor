@@ -1,12 +1,29 @@
-const express=require('express')
-const cors=require('cors')
-const mongoose=require('mongoose')
-require('dotenv').config()
-const analysisRoute=require('./routes/analysisRoutes')
+import express from 'express';
+import { readFileSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import { config } from 'dotenv';
+import analysisRoutes from './routes/analysisRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import admin from 'firebase-admin';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+config();
+
+const serviceAccountPath = path.join(__dirname, 'serviceAccountKey.json');
+const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
+
+console.log("admin:", admin);
+
+admin.initializeApp({
+    credential:admin.credential.cert(serviceAccount)
+})
 
 const app=express()
 
-const PORT=process.env.PORT || 5000
+const PORT=process.env.PORT
 
 app.use(cors({
     origin:process.env.CLIENT_URL
@@ -14,7 +31,8 @@ app.use(cors({
 app.use(express.json())  //Allow server to accept JSON in req body
 
 
-app.use('/api',analysisRoute)
+app.use('/api',analysisRoutes)
+app.use('/auth',authRoutes)
 app.get('/',(req,res)=>{
     res.json({ message: "API Gateway is running" });
 })
