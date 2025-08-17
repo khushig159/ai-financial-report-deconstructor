@@ -1,0 +1,134 @@
+body{
+    font-family: 'DM sans';
+}
+.upper{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.upper h1{
+    font-family: 'DM sans';
+    font-weight: 500;
+    padding-left: 20px;
+}
+.upper button{
+    margin-right: 20px;
+    padding: 10px 15px;
+     border: none;
+    margin-left: 10px;
+    border-radius: 20px;
+    height: 50px;
+    font-family: 'DM sans';
+    font-size: 14px;
+}
+.upper p{
+    font-size: 14px;
+    color: #888;
+    font-family: 'DM sans';
+    margin-left: 20px;
+}
+.upper button{
+    background-color: rgb(15, 111, 116);
+    transition: 0.2s ease all;
+    color: white;
+}
+.upper button:hover{
+    border:2px solid rgb(15, 111, 116);
+    background-color: white;
+    color: black;
+}
+h3{
+    text-align: left;
+    margin-left: 20px;
+    font-size: 20px;
+}
+.grid{
+    margin-left: 20px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.card{
+    box-shadow: 0 6px 18px rgba(40, 59, 129, 0.116);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 30px;
+    border-radius: 20px;
+    font-family: 'DM sans';
+    transition: 0.2s all ease;
+}
+.card:hover{
+    transform: scale(1.04);
+}
+.card p{
+    color: #888;
+}
+.card h3{
+    font-weight: 800;
+    font-size: 35px;
+    color: rgb(3, 3, 100);
+}
+
+.topic{
+    display: flex;
+    margin-top: 30px;
+    font-family: 'DM sans';
+    align-items: center;
+    justify-content: left;
+    margin-bottom: 25px;
+    margin-left: 20px;
+}
+.topic h2{
+    font-weight: 600;
+    margin-top: 25px;
+}
+.p{
+    text-align: justify;
+    width: 90%;
+    padding-left: 40px;
+    color: #888;
+    font-family: 'DM sans';
+}
+.takeaway{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: left;
+    width: 100%;
+    margin-left: 40px;
+    margin-right: 40px;
+}
+.takeaway h2{
+    font-weight: 500;
+    margin-bottom: 20px;
+    margin-left: 30px;
+    font-size: 27px;
+}
+.list{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(40, 59, 129, 0.116);
+    padding: 20px;
+    border-radius: 20px;
+    gap: 20px;
+    transition: all 0.2s ease;
+    margin-bottom: 20px;
+}
+.list p{
+    font-size: 17px;
+    color: #565555;
+    font-weight: 500;
+}
+.list:hover{
+    transform: scale(1.02);
+}
+.topcon{
+    display: flex;
+    
+}

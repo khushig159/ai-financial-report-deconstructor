@@ -8,14 +8,17 @@ import {
   ListItemText,
   Chip,
   Grid,
+  Button
 } from "@mui/material";
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
 import ExplainChartModal from "./ExplainChartModal";
-// Helper to get a color for each ESG category
+import DebtSchedule from "./DebtSchedule";
+import styles from '../module/metrics.module.css'
 const COLORS = {
-  Environmental: "#4caf50", // green
-  Social: "#2196f3", // blue
-  Governance: "#ffc107", // yellow
+  Environmental: "#57b45aff", // green
+  Social: "#5caef2ff", // blue
+  Governance: "#e8bb33ff", // yellow
 };
 
 const getCategoryChipColor = (category) => {
@@ -27,18 +30,18 @@ const getCategoryChipColor = (category) => {
   return "default";
 };
 
-function EsgAnalysis({ data }) {
+function EsgAnalysis({ data,context,debt}) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const mentions = data?.esg_mentions;
 
   if (!mentions || mentions.length === 0) {
     return (
-      <Paper sx={{ p: 3, backgroundColor: "#2a2a2a" }}>
-        <Typography variant="h6" gutterBottom>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom sx={{fontFamily:'DM sans'}}>
           ESG (Environmental, Social, and Governance)
         </Typography>
-        <Typography>
+        <Typography sx={{fontFamily:'DM sans'}}>
           No specific ESG-related statements were identified in this report.
         </Typography>
       </Paper>
@@ -59,14 +62,13 @@ function EsgAnalysis({ data }) {
   }));
 
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+    <div style={{marginLeft:'320px',marginRight:'30px'}}>
+      <Typography variant="h6" gutterBottom sx={{ mb: 2,fontFamily:'DM sans',color:'black',fontSize:'25px' }} >
         ESG Mention Analysis
       </Typography>
       <Grid container spacing={4}>
-        {/* Treemap Chart Section */}
-        <Grid item xs={12} md={5}>
-          <Paper sx={{ p: 2, backgroundColor: "#2a2a2a", height: 400 }}>
+        <Grid item xs={12} md={5} sx={{width:'95%'}}>
+          <Paper sx={{width:'100%', p: 3, height: 400 }}>
             <Box
               sx={{
                 display: "flex",
@@ -74,29 +76,28 @@ function EsgAnalysis({ data }) {
                 alignItems: "center",
               }}
             >
-              <Typography variant="h6" align="center" gutterBottom>
+              <Typography variant="h6" align="center" gutterBottom sx={{fontFamily:'DM sans',marginBottom:'30px'}}>
                 ESG Focus Areas by Mention Count
               </Typography>
-              <Button
+              <button className={styles.bu}
                 startIcon={<HelpOutlineIcon />}
                 onClick={() => setModalOpen(true)}
                 size="small"
               >
                 Explain this Tree Map
-              </Button>
+              </button>
             </Box>
-            <ResponsiveContainer width="100%" height="90%">
+            <ResponsiveContainer width="100%" height="83%">
               <Treemap
                 data={chartData}
                 dataKey="size"
                 ratio={4 / 3}
                 stroke="#fff"
-                fill="#8884d8"
+                fill="#d2d0edff"
               >
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#333",
-                    border: "1px solid #555",
+                    // border: "1px solid #555",
                   }}
                   labelStyle={{ color: "#fff" }}
                 />
@@ -110,27 +111,26 @@ function EsgAnalysis({ data }) {
           <Paper
             sx={{
               p: 2,
-              backgroundColor: "#2a2a2a",
-              height: 400,
+              // height: 400,
               overflowY: "auto",
             }}
           >
-            <Typography variant="h6" gutterBottom sx={{ p: 1 }}>
+            <Typography variant="h6" gutterBottom sx={{ p: 1,fontFamily:'DM sans',fontSize:'25px' }}>
               All Identified Statements
             </Typography>
             <List>
               {mentions.map((item, index) => (
                 <ListItem key={index} alignItems="flex-start">
-                  <ListItemText
-                    primary={item.statement}
-                    secondary={
+                  <ListItemText 
+                  primary={
                       <Chip
                         label={item.category}
                         color={getCategoryChipColor(item.category)}
                         size="small"
-                        sx={{ mt: 1 }}
+                        sx={{ mt: 1 ,fontFamily:'DM sans', padding:'10px', marginBottom:'10px'}}
                       />
                     }
+                  secondary={item.statement} 
                   />
                 </ListItem>
               ))}
@@ -145,7 +145,8 @@ function EsgAnalysis({ data }) {
         chartData={chartData}
         context={JSON.stringify(data)}
       />
-    </Box>
+      <DebtSchedule data={debt} context={context}/>
+    </div>
   );
 }
 

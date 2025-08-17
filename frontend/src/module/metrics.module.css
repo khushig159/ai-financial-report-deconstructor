@@ -1,0 +1,47 @@
+.container{
+    margin-left: 320px;
+    margin-right: 20px;
+}
+.container h2{
+    font-size: 30px;
+    font-weight: 500;
+    margin-bottom: 30px;
+    color: black;
+}
+.cardd h2{
+    font-weight: 650;
+    margin-top: 10px;
+    color: rgb(8, 8, 66);
+}
+.cardd p{
+    color: #4e4d4d;
+}
+p{
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+.bu{
+    border: none;
+    margin-right: 10px;
+    padding: 7px 20px;
+    margin-left: 10px;
+    border-radius: 20px;
+    /* height: 50px; */
+    font-family: 'DM sans';
+    font-size: 14px;
+    background-color: #b2dbf1;
+    transition: 0.2s all ease;
+}
+.bu:hover{
+    color: #828080;
+}
+.grid{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+.finace{
+    margin-left: 320px;
+    margin-right: 25px;
+}

@@ -1,9 +1,11 @@
 import React from 'react';
 import { Paper, Typography, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import GavelIcon from '@mui/icons-material/Gavel';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
-function LegalSummary({ data }) {
-  const proceedings = data?.legal_summary;
+
+function LegalSummary({ legal }) {
+  const proceedings = legal?.legal_summary;
 
   if (!proceedings || proceedings.length === 0 || (proceedings[0] && proceedings[0].includes("Error"))) {
     return (

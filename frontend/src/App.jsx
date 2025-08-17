@@ -21,18 +21,18 @@ import { auth } from "./firebase";
 import { signOut } from "firebase/auth";
 import DashBoard from "./pages/DashBoard";
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: { main: "#90caf9" },
-    background: { default: "#121212", paper: "#1e1e1e" },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h4: { fontWeight: 700 },
-    h5: { fontWeight: 600 },
-  },
-});
+// const darkTheme = createTheme({
+//   palette: {
+//     mode: "dark",
+//     primary: { main: "#90caf9" },
+//     background: { default: "#fff", paper: "#fff" },
+//   },
+//   typography: {
+//     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+//     h4: { fontWeight: 700 },
+//     h5: { fontWeight: 600 },
+//   },
+// });
 
 
 
@@ -48,22 +48,20 @@ const handleLogout = async () => {
   };
   if (isAuthLoading) {
     return (
-      <ThemeProvider theme={darkTheme}>
-        <CssBaseline />
+      // <ThemeProvider theme={darkTheme}>
+        // <CssBaseline />
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
           <CircularProgress />
         </Box>
-      </ThemeProvider>
+      // </ThemeProvider>
     );
   }
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-      >
-        <AppBar position="static">
-          <Toolbar>
+    // <ThemeProvider theme={darkTheme}>
+      < >
+     
+        {/* <AppBar position="static"> */}
+          {/* <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               AI Financial Report Deconstructor
             </Typography>
@@ -72,8 +70,8 @@ const handleLogout = async () => {
                 Logout
               </Button>
             )}
-          </Toolbar>
-        </AppBar>
+          </Toolbar> */}
+        {/* </AppBar> */}
         <Container component="main" sx={{ mt: 4, mb: 4 }}>
           {currentUser ? <DashBoard /> : <AuthPage />}
           {error && (<Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>)}
@@ -84,7 +82,7 @@ const handleLogout = async () => {
           BackdropComponent={Backdrop}
           BackdropProps={{
             timeout: 500,
-            sx: { backgroundColor: 'rgba(0, 0, 0, 0.8)' }
+            sx: { backgroundColor: 'rgba(0, 0, 0, 0.7)' }
           }}
         >
           <Fade in={isLoading}>
@@ -105,8 +103,9 @@ const handleLogout = async () => {
             </Box>
           </Fade>
         </Modal>
-      </Box>
-    </ThemeProvider>
+      {/* </Box> */}
+      </>
+    // </ThemeProvider>
   );
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Paper, Typography, Grid, Button } from "@mui/material";
+import { Box, Paper, Typography, Grid, Button, Divider } from "@mui/material";
 import {
   LineChart,
   Line,
@@ -9,12 +9,19 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   Legend,
 } from "recharts";
+import { Tooltip } from "@mui/material";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import ExplainChartModal from "./ExplainChartModal";
 // import useAnalysisStore from "../stores/useAnalysisStore";
 // import axios from 'axios';
+import BenchmarkDisplay from "./BenchmarkDisplay";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import styles from '../module/metrics.module.css'
 
 const parseFinancialValue = (valueStr) => {
   if (typeof valueStr !== "string" || valueStr === "N/A") {
@@ -52,28 +59,25 @@ function MetricCard({ title, value, data }) {
         flexDirection: "column",
         justifyContent: "space-between",
         height: "150px", // Fixed height for alignment
-        backgroundColor: "#2a2a2a",
       }}
     >
-      <Box>
-        <Typography variant="subtitle1" color="text.secondary">
+      <div className={styles.cardd}>
+        <p>
           {title}
-        </Typography>
-        <Typography
-          variant="h4"
-          sx={{ fontWeight: "bold", color: "primary.main", mt: 1 }}
+        </p>
+        <h2
         >
           {value}
-        </Typography>
-      </Box>
+        </h2>
+      </div>
       <Box sx={{ height: "40px", width: "100%" }}>
         {data && data.length >= 1 ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
-              <Tooltip
+              <RechartsTooltip
                 contentStyle={{
-                  backgroundColor: "#333",
-                  border: "1px solid #555",
+                  // backgroundColor: "#333",
+                  // border: "1px solid #555",
                 }}
                 labelStyle={{ color: "#fff" }}
                 formatter={(value) => [`${value.toLocaleString()}`, "Value"]}
@@ -82,7 +86,7 @@ function MetricCard({ title, value, data }) {
                 type="monotone"
                 dataKey="value"
                 stroke={trendColor}
-                strokeWidth={2}
+                strokeWidth={3}
                 dot={false}
               />
             </LineChart>
@@ -96,25 +100,103 @@ function MetricCard({ title, value, data }) {
     </Paper>
   );
 }
+const getBenchMarkStyle = (comparisonText) => {
+  if (!comparisonText)
+    return { color: "text.secondary", icon: <TrendingFlatIcon /> };
+  const text = comparisonText.toLowerCase();
+  if (
+    text.includes("strong") ||
+    text.includes("above average") ||
+    text.includes("healthy") ||
+    text.includes("better")
+  ) {
+    return { color: "success.main", icon: <TrendingUpIcon /> };
+  }
+  if (
+    text.includes("weak") ||
+    text.includes("below average") ||
+    text.includes("concerning") ||
+    text.includes("worse")
+  ) {
+    return { color: "error.main", icon: <TrendingDownIcon /> };
+  }
+  return { color: "warning.main", icon: <TrendingFlatIcon /> };
+};
+function RatioGauge({ title, value, benchMark }) {
+  const style = getBenchMarkStyle(benchMark);
+  const numericValue = parseFloat(value?.replace("%", "")) || 0;
+  return (
+    <Tooltip
+      title={benchMark || "No benchmark available"}
+      placement="top"
+      arrow
+    >
+      <Paper
+        elevation={4}
+        sx={{
+          p: 2,
+          height: "100%",
+          width:'90%',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div style={{display:'flex', alignItems:'start', gap:'20px'}}>
+          <p style={{fontSize:'14px'}}>
+            {title}
+          </p>
+          {React.cloneElement(style.icon, { sx: { color: style.color } })}</div>
+        </Box>
+        <h2
+          style={{fontSize:'36px', fontWeight:'600'}}
+        >
+          {value}
+        </h2>
 
-function MetricsDashboard({ data, analysisResult ,context}) {
-  const[modalOpen,setModalOpen]=useState(false)
+        <Box
+          sx={{
+            width: "100%",
+            height: "8px",
+            backgroundColor: "grey.300",
+            borderRadius: "4px",
+          }}
+        >
+          <Box
+            sx={{
+              width: `${Math.min(numericValue, 100)}%`,
+              height: "100%",
+              backgroundColor: style.color,
+              borderRadius: "4px",
+            }}
+          />
+        </Box>
+      </Paper>
+    </Tooltip>
+  );
+}
+function MetricsDashboard({
+  data,
+  ratios,
+  benchmarkData,
+  analysisResult,
+  context,
+}) {
+  const ratio = ratios?.ratios;
+  const [modalOpen, setModalOpen] = useState(false);
   const [chartUnit, setChartUnit] = useState("Millions");
   const [history, setHistory] = useState([]);
   console.log(analysisResult);
 
   useEffect(() => {
     if (analysisResult) {
-      // const fetchHistory = async () => {
-      //   try {
-      //     const API_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:5000';
-      //     const response = await axios.get(`${API_URL}/api/history/${filename}`);
-      //     setHistory(response.data);
-      //   } catch (err) {
-      //     console.error("Failed to fetch history for sparklines:", err);
-      //   }
-      // };
-      // fetchHistory();
       if (!analysisResult?.key_metrics) return;
       const reports = [];
 
@@ -184,84 +266,122 @@ function MetricsDashboard({ data, analysisResult ,context}) {
       "Net Income": parseFinancialValue(data.netIncome),
     },
   ];
-// function handleExplain(){
-//   setModalOpen(true)
-//   setchartData(chartData)
-//   setchartTitle()
-// }
+  // function handleExplain(){
+  //   setModalOpen(true)
+  //   setchartData(chartData)
+  //   setchartTitle()
+  // }
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-        Key Financial Metrics
-      </Typography>
+    <>
+    <div className={styles.container}>
+      <div>
+        <h2>
+          Key Financial Metrics
+        </h2>
 
-      {/* Stat Cards (Unchanged) */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
-          gap: 2,
-          mb: 4,
-        }}
-      >
-        <MetricCard
-          title="Total Revenue"
-          value={data.revenue || "N/A"}
-          data={revenueHistory}
-        />
-        <MetricCard
-          title="Net Income"
-          value={data.netIncome || "N/A"}
-          data={netIncomeHistory}
-        />
-        <MetricCard
-          title="Diluted EPS"
-          value={data.eps || "N/A"}
-          data={epsHistory}
-        />
-      </Box>
-
-      {/* Bar Chart Visualization */}
-      <Paper sx={{ p: 2, mt: 3, backgroundColor: "#2a2a2a" }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6" gutterBottom sx={{ ml: 2, mt: 1 }}>Revenue vs. Net Income ( in {chartUnit})</Typography>
-            {/* --- NEW: Explain Button --- */}
-            <Button startIcon={<HelpOutlineIcon />} onClick={()=>setModalOpen(true)} size="small">
-                Explain this Chart
-            </Button>
+        {/* Stat Cards (Unchanged) */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
+            gap: 2,
+            mb: 4,
+          }}
+        >
+          <MetricCard
+            title="Total Revenue"
+            value={data.revenue || "N/A"}
+            data={revenueHistory}
+          />
+          <MetricCard
+            title="Net Income"
+            value={data.netIncome || "N/A"}
+            data={netIncomeHistory}
+          />
+          <MetricCard
+            title="Diluted EPS"
+            value={data.eps || "N/A"}
+            data={epsHistory}
+          />
         </Box>
-        <Box sx={{ height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+
+        {/* Bar Chart Visualization */}
+        <Paper sx={{ p: 2, mt: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <p className={styles.p}>
+              Revenue vs. Net Income ( in {chartUnit})
+            </p>
+            <button className={styles.bu}
+              onClick={() => setModalOpen(true)}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-              <XAxis dataKey="name" tick={{ fill: "#ccc" }} />
-              {/* The Y-axis now uses our formatter */}
-              <YAxis tick={{ fill: "#ccc" }} tickFormatter={formatYAxis} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#333",
-                  border: "1px solid #555",
-                }}
-                labelStyle={{ color: "#fff" }}
-              />
-              <Legend wrapperStyle={{ color: "#ccc" }} />
-              <Bar dataKey="Revenue" fill="#8884d8" />
-              <Bar dataKey="Net Income" fill="#82ca9d" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Box>
-      </Paper>
-      <ExplainChartModal
-      open={modalOpen}
-      handleClose={() => setModalOpen(false)}
-      chartTitle='Revenue vs. Net Income'
-      chartData={chartData}
-      context={context}
-      />
-    </Box>
+              Explain this Chart
+            </button>
+          </Box>
+          <Box sx={{ height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={chartData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="5 5" stroke="#cdccccff" />
+                <XAxis dataKey="name" tick={{ fill: "#7d7d7dff" }} />
+                {/* The Y-axis now uses our formatter */}
+                <YAxis tick={{ fill: "#7d7d7dff" }} tickFormatter={formatYAxis} />
+                <RechartsTooltip
+                  contentStyle={{
+                    // backgroundColor: "#333",
+                    // border: "1px solid #a4a3a3ff",
+                  }}
+                  labelStyle={{ color: "#fff" }}
+                />
+                <Legend wrapperStyle={{ color: "#ccc" }} />
+                <Bar dataKey="Revenue" fill="#5eaad0d8" />
+                <Bar dataKey="Net Income" fill="#59d287ff" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
+        </Paper>
+        <ExplainChartModal
+          open={modalOpen}
+          handleClose={() => setModalOpen(false)}
+          chartTitle="Revenue vs. Net Income"
+          chartData={chartData}
+          context={context}
+        />
+      </div>
+      <Box>
+        <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+          Key Financial Ratios
+        </Typography>
+        <div className={styles.grid}>
+          {ratio.map((rat, index) => {
+            const benchmark = benchmarkData?.benchmarks?.find(
+              (b) => b.name === rat.name
+            );
+            return (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <RatioGauge
+                  title={rat.name}
+                  value={rat.value}
+                  benchMark={benchmark?.comparison}
+                />
+              </Grid>
+            );
+          })}
+        </div>
+
+        <Divider sx={{ my: 4 }} />
+
+        <BenchmarkDisplay data={benchmarkData} />
+      </Box>
+      </div>
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 
+
 const getBenchMarkStyle=(comparisonText)=>{
   if (!comparisonText) return { color: 'text.secondary', icon: <TrendingFlatIcon /> };
   const text = comparisonText.toLowerCase();
@@ -43,7 +44,7 @@ function RatioGauge({title,value,benchMark}){
                     {value}
                 </Typography>
                 
-                <Box sx={{ width: '100%', height: '8px', backgroundColor: 'grey.700', borderRadius: '4px', overflow: 'hidden' }}>
+                <Box sx={{ width: '100%', height: '8px', backgroundColor: 'grey.700', borderRadius: '4px' }}>
                     <Box sx={{ width: `${Math.min(numericValue, 100)}%`, height: '100%', backgroundColor: style.color, borderRadius: '4px' }} />
                 </Box>
 
@@ -51,30 +52,6 @@ function RatioGauge({title,value,benchMark}){
         </Tooltip>
     );
 }
-// A single, reusable card for each ratio
-// function RatioCard({ title, value }) {
-//   return (
-//     <Paper 
-//       elevation={4} 
-//       sx={{ 
-//         p: 2, 
-//         display: 'flex', 
-//         flexDirection: 'column', 
-//         justifyContent: 'center', 
-//         alignItems: 'center',
-//         height: '100%',
-//         backgroundColor: '#2a2a2a'
-//       }}
-//     >
-//       <Typography variant="subtitle1" color="text.secondary">
-//         {title}
-//       </Typography>
-//       <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main', mt: 1 }}>
-//         {value}
-//       </Typography>
-//     </Paper>
-//   );
-// }
 
 function RatioAnalysis({ data ,benchmarkData}) {
   const ratios = data?.ratios;

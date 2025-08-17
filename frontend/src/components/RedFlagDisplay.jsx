@@ -15,7 +15,7 @@ function RedFlagDisplay({ data }) {
 
   return (
     <Box sx={{ mt: 4 }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" sx={{fontFamily:'DM sans',fontSize:'25px'}}>
         AI-Detected Potential Red Flags
       </Typography>
       <List>
@@ -24,7 +24,8 @@ function RedFlagDisplay({ data }) {
             <ListItemIcon sx={{ mt: 0.5 }}>
               <FlagIcon color="error" />
             </ListItemIcon>
-            <ListItemText primary={flag} />
+            <p style={{fontFamily:'DM sans', fontSize:'16px',fontWeight:'400',color:'#6c6b6bff'}}>
+            {flag}</p>
           </ListItem>
         ))}
       </List>

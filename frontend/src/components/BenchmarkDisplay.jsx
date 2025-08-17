@@ -25,9 +25,9 @@ function BenchmarkDisplay({ data }) {
 
   return (
     <Box sx={{ mt: 3 }}>
-      <Typography variant="h6" gutterBottom>
+      <h2 style={{marginTop:'40px'}}>
         Industry Benchmarking
-      </Typography>
+      </h2>
       {benchmarks.map((item, index) => {
         const style = getComparisonStyle(item.comparison);
         return (
@@ -36,9 +36,9 @@ function BenchmarkDisplay({ data }) {
               icon={style.icon}
               label={item.name} 
               size="small" 
-              sx={{ mb: 0.5, fontWeight: 'bold' }}
+              sx={{ mb: 0.5, fontWeight: '600' ,fontFamily:'DM sans', padding:'13px', marginBottom:'13px'}}
             />
-            <Typography variant="body2" color={style.color}>
+            <Typography variant="body2" color={style.color} sx={{fontFamily:'DM sans', width:'95%', fontWeight:'500',fontSize:'15px'}}>
               {item.comparison}
             </Typography>
           </Box>

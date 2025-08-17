@@ -1,13 +1,14 @@
 import React from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import { RadialBarChart, RadialBar, Legend, ResponsiveContainer, PolarAngleAxis } from 'recharts';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
-function ManagementTone({ data }) {
-  if (!data || data.cautiousness_score === -1 || data.summary === "N/A") {
+function ManagementTone({ manage }) {
+  if (!manage || manage.cautiousness_score === -1 || manage.summary === "N/A") {
     return <Typography>No management tone data available for this report.</Typography>;
   }
 
-  const { summary, cautiousness_score } = data;
+  const { summary, cautiousness_score } = manage;
 
   // Data for the radial bar chart. Recharts expects an array.
   const chartData = [

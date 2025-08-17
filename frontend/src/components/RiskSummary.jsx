@@ -10,7 +10,7 @@ function RiskSummary({ data,redFlagsData  }) {
 
   return (
     <Paper sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" sx={{fontFamily:'DM sans',fontSize:'25px'}}>
         Top Identified Risks & Anomaly Flags
       </Typography>
       <List>
@@ -19,7 +19,7 @@ function RiskSummary({ data,redFlagsData  }) {
             <ListItemIcon sx={{ mt: 0.5 }}>
               <WarningAmberIcon color="error" />
             </ListItemIcon>
-            <ListItemText primary={risk} />
+            <p style={{fontFamily:'DM sans', fontSize:'16px',fontWeight:'400',color:'#6c6b6bff'}}>{risk}</p>
           </ListItem>
         ))}
       </List>

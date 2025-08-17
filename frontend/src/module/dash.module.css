@@ -1,0 +1,74 @@
+.cont{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.button1, .button2{
+    border: none;
+    margin-right: 10px;
+    padding: 10px 20px;
+    margin-left: 10px;
+    border-radius: 20px;
+    height: 50px;
+    font-family: 'DM sans';
+    font-size: 14px;
+    width: 130px;
+    margin-top: 20px;
+}
+.butcon{
+    text-align: center;
+}
+.style{
+    font-family: 'DM sans';
+    /* font-size: 12px; */
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    padding: 40px;
+    border-radius: 20px;
+}
+.container2{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 100px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    padding: 40px;
+    border-radius: 20px;
+}
+.button1{
+    background-color: rgb(15, 111, 116);
+    transition: 0.2s ease all;
+    color: white;
+}
+.button1:hover{
+    border:2px solid rgb(15, 111, 116);
+    background-color: white;
+    color: black;
+}
+.button2:hover{
+    color: white;
+    background-color: rgb(15, 111, 116);
+}
+.button2{ 
+    border:2px solid rgb(15, 111, 116);
+    background-color: white;
+}
+.text{
+    font-family: 'DM sans';
+    font-size: 15px;
+}
+.field{
+    border-radius: 20px;
+    width: 30%;
+   
+}
+.carddd{
+    box-shadow: 0 6px 18px rgba(40, 59, 129, 0.116);
+    margin-top: 20px;
+}

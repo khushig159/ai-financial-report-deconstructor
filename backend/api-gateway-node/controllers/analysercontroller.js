@@ -35,7 +35,7 @@ const getRiskComparison = async (previous_risk_text, current_risk_text) => {
     You are an expert financial compliance officer. Compare the "Risk Factors" from two consecutive reports.
     PREVIOUS: "${previous_risk_text}"
     CURRENT: "${current_risk_text}"
-    1.  **Comparison Summary:**Summarize the meaningful, substantive changes (new risks, removed risks, or significantly altered language).
+    1.  **Comparison Summary:**Summarize the meaningful, substantive changes (new risks, removed risks, or significantly altered language). The difference must be relevant, useless differences must be avoided
     2.  **Word Cloud Data:** You are a risk analyst. Read the following "Risk Factors" text and identify the 30 most important and frequently mentioned keywords or two-word phrases.
     Ignore common words like "company", "business", "risk", "factors", "may", "could". Focus on specific risk topics like "intense competition", "supply chain", "cybersecurity", "government regulation", "economic conditions", etc.
 
@@ -43,11 +43,16 @@ const getRiskComparison = async (previous_risk_text, current_risk_text) => {
     - "comparison_summary": An array of strings, where each string is a summary of a single meaningful change.
     - "wordcloud_data": An array of objects, where each object has "text" and "value" (a score from 10-100) keys.
 
+    Respond ONLY with **strictly valid JSON**, using **double quotes** for keys and strings.  
+Do NOT include markdown, comments, or extra text. Do NOT include trailing commas.
+
+Make sure all arrays and objects are properly closed. The JSON must be parseable by JSON.parse() in Node.js.
+
     If no changes are found for a task, return an empty array for that key.
     `;
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text().replace('```json', '').replace('```', '');
+const text = response.text().replace(/```json|```/g, '').trim();
     return JSON.parse(text);
 };
 

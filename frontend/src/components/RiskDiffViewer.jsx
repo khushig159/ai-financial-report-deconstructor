@@ -16,22 +16,36 @@ function RiskDiffViewer({ oldText, newText, comparisonSummary,wordCloudData }) {
 
   const areTextsIdentical = oldText.trim() === newText.trim();
   const hasValidSummary = comparisonSummary && comparisonSummary.comparison_summary && comparisonSummary.comparison_summary.length > 0;
-
+const customStyles = {
+  variables: {
+    dark: {
+      diffViewerBackground: '#1e1e1e', // Background color
+      diffViewerColor: '#fff', // Text color
+      addedBackground: '#86d386ff', // Background for added text
+      addedColor: '#070a07ff', // Text color for added text
+      removedBackground: '#871515cd', // Background for removed text
+      removedColor: '#ffffffff', // Text color for removed text
+      wordAddedBackground: '#4dbe4dff', // Background for word additions
+      wordRemovedBackground: '#4d000099', // Background for word removals
+      addedGutterBackground: '#d0f4d042', // Gutter background for added lines
+      removedGutterBackground: '#330000', // Gutter background for removed lines
+    },
+  },
+};
   return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
+    <div style={{marginLeft:'320px',marginRight:'30px'}}>
+      <Typography variant="h6" gutterBottom sx={{fontFamily:'DM sans',color:'black', fontSize:'25px'}}>
         Risk Factor Comparison
       </Typography>
 
-      {/* AI Summary Section (Unchanged) */}
-      <Paper sx={{ p: 2, mb: 3, backgroundColor: '#2a2a2a' }}>
-        <Typography variant="h6" gutterBottom>
+      <Paper sx={{ p: 2, mb: 3 }}>
+      <Typography variant="h6" gutterBottom sx={{fontFamily:'DM sans',color:'black', fontSize:'20px'}}>
           AI-Generated Summary of Changes
         </Typography>
         {areTextsIdentical || !hasValidSummary ? (
           <Box sx={{ display: 'flex', alignItems: 'center', color: 'success.main' }}>
             <CheckCircleOutlineIcon sx={{ mr: 1 }} />
-            <Typography>
+      <Typography variant="h6" gutterBottom sx={{fontFamily:'DM sans',color:'black', fontSize:'25px'}}>
               No significant changes were detected by the AI.
             </Typography>
           </Box>
@@ -42,32 +56,31 @@ function RiskDiffViewer({ oldText, newText, comparisonSummary,wordCloudData }) {
                 <ListItemIcon sx={{ minWidth: 32 }}>
                   <ChangeHistoryIcon color="primary" />
                 </ListItemIcon>
-                <ListItemText primary={change} />
+                <p style={{fontFamily:'DM sans', fontSize:'16px', color:'#646363ff'}}>{change}</p>
               </ListItem>
             ))}
           </List>
         )}
       </Paper>
-      <Paper sx={{ p: 2, mb: 3, backgroundColor: '#2a2a2a' }}>
+      <Paper sx={{ p: 2, mb: 3 }}>
         <RiskWordCloud data={wordCloudData} />
       </Paper>
-      {/* Raw Diff Viewer Section (Now Responsive) */}
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom sx={{fontFamily:'DM sans',color:'black', fontSize:'20px'}}>
         Detailed Side-by-Side View
       </Typography>
-      <Box sx={{ mt: 1, '& .diff-viewer': { backgroundColor: '#1e1e1e', fontFamily: 'monospace' } }}>
-        <ReactDiffViewer
-          oldValue={oldText}
-          newValue={newText}
-          // The view is now conditional on the screen size
-          splitView={isDesktop} 
-          compareMethod={DiffMethod.WORDS}
-          useDarkTheme={true}
-          leftTitle={isDesktop ? "Previous Period" : undefined}
-          rightTitle={isDesktop ? "Current Period" : "Comparison"}
-        />
+      <Box sx={{ mt: 1, '& .diff-viewer': { fontFamily: 'monospace' } }}>
+         <ReactDiffViewer
+      oldValue={oldText}
+      newValue={newText}
+      splitView={isDesktop}
+      compareMethod={DiffMethod.WORDS}
+      useDarkTheme={true}
+      leftTitle={isDesktop ? 'Previous Period' : undefined}
+      rightTitle={isDesktop ? 'Current Period' : 'Comparison'}
+      styles={customStyles}
+    />
       </Box>
-    </Box>
+    </div>
   );
 }
 

@@ -26,10 +26,10 @@ function FootnoteExplorer({ data }) {
   );
 
   return (
-    <Box>
+    <div style={{marginLeft:'320px',marginRight:'20px'}}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">
-          Interactive Footnote Explorer
+        <Typography variant="h6" sx={{fontFamily:'DM sans' ,color:'black',fontSize:'25px'}}>
+           Footnote Explorer
         </Typography>
         {/* --- NEW: Search Bar --- */}
         <TextField
@@ -38,6 +38,7 @@ function FootnoteExplorer({ data }) {
           size="small"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{marginTop:'10px'}}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -50,12 +51,12 @@ function FootnoteExplorer({ data }) {
       
       {filteredFootnotes.length > 0 ? (
         filteredFootnotes.map((note, index) => (
-          <Accordion key={index} sx={{ backgroundColor: '#2a2a2a', mb: 1 }}>
+          <Accordion key={index} sx={{  mb: 1 }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography sx={{ fontWeight: 'bold' }}>{note.topic}</Typography>
+              <Typography sx={{ fontWeight: 'bold',fontFamily:'DM sans' }}>{note.topic}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{fontFamily:'DM sans'}}>
                 {note.summary}
               </Typography>
             </AccordionDetails>
@@ -66,7 +67,7 @@ function FootnoteExplorer({ data }) {
           No footnotes match your search term.
         </Typography>
       )}
-    </Box>
+    </div>
   );
 }
 

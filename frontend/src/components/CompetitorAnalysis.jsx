@@ -34,23 +34,23 @@ function CompetitorAnalysis({ data }) {
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+      <Typography sx={{ mb: 2 ,color:'black',fontFamily:'DM sans', fontSize:'25px',fontWeight:'500'}}>
         Competitive Landscape Analysis
       </Typography>
       <Grid container spacing={3}>
         {competitors.map((competitor, index) => (
           <Grid item xs={12} md={6} lg={4} key={index}>
-            <Card sx={{ height: '100%', backgroundColor: '#2a2a2a' }}>
+            <Card sx={{ height: '100%',boxShadow:'0 6px 18px rgba(40, 59, 129, 0.116)'}}>
               <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <Avatar sx={{ bgcolor: stringToColor(competitor.name), mr: 2, fontWeight: 'bold' }}>
                     {competitor.name.charAt(0)}
                   </Avatar>
-                  <Typography variant="h6" component="div">
+                  <Typography variant="h6" component="div" sx={{fontFamily:'DM sans'}}>
                     {competitor.name}
                   </Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{fontFamily:'DM sans', fontSize:'15px', color:'#474646ff'}}>
                   {competitor.context}
                 </Typography>
               </CardContent>

@@ -10,9 +10,9 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 430,
   bgcolor: 'background.paper',
-  border: '2px solid #000',
+  // border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -50,7 +50,7 @@ function ExplainChartModal({ open, handleClose, chartTitle, chartData, context }
   return (
     <Modal open={open} onClose={handleClose}>
       <Paper sx={modalStyle}>
-        <Typography variant="h6" component="h2" gutterBottom>
+        <Typography variant="h6" component="h3" sx={{fontFamily:'DM sans'}}>
           AI Explanation for: {chartTitle}
         </Typography>
 
@@ -65,14 +65,14 @@ function ExplainChartModal({ open, handleClose, chartTitle, chartData, context }
             {explanation}
           </Typography>
         ) : (
-          <Typography sx={{ mt: 2 }}>
+          <Typography sx={{ mt: 2 ,fontFamily:"DM sans",color:'#656565ff'}}>
             Click the button below to generate an AI-powered explanation for this chart.
           </Typography>
         )}
 
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-          <Button onClick={handleClose}>Close</Button>
-          <Button variant="contained" onClick={handleExplain} disabled={isLoading}>
+          <Button onClick={handleClose} sx={{fontFamily:'DM sans', color:'#0d8696ff'}}>Close</Button>
+          <Button variant="contained" sx={{fontFamily:'DM sans', backgroundColor:'#0d8696ff'}} onClick={handleExplain} disabled={isLoading}>
             {isLoading ? 'Generating...' : 'Explain'}
           </Button>
         </Box>
