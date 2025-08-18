@@ -34,7 +34,10 @@ It transforms **unstructured PDF data into structured, actionable insights** in 
    - If you upload only one report but uploaded others before → system automatically finds the last report for historical comparison.  
 3. **Processing** → AI engine parses PDFs, extracts structured data, and runs analysis.  
 4. **Interactive Dashboard** → Get a clean, multi-tab interface with **metrics, visualizations, AI insights, and comparisons**.  
-5. **Export** → Download a **professionally formatted PDF report** with executive summary, financials, and risks.  
+5. **Export** → Download a **professionally formatted PDF report** with executive summary, financials, and risks.
+
+**Note** -> Demo Video has been provided in file named Finacial_Analyzer.mp4
+
 
 ---
 
