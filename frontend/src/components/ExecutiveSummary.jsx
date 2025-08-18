@@ -5,7 +5,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import styles from '../module/exe.module.css'
 
-function ExecutiveSummary({ data ,ratios,handleupload,ticker}) {
+function ExecutiveSummary({ data ,ratios,handleupload,handleExport,ticker}) {
     const ratio = ratios?.ratios;
   const summary = data?.executive_summary;
 
@@ -42,7 +42,10 @@ function ExecutiveSummary({ data ,ratios,handleupload,ticker}) {
         <div>
       <h1>Executive Summary</h1>
       <p>Analytics of {ticker}</p></div>
+      <div>
       <button onClick={handleupload}>Upload File</button>
+      <button onClick={handleExport}>Get PDF</button>
+      </div>
       </div>
       <div style={{width:'100%'}}>
         <div className={styles.grid}>

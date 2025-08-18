@@ -44,16 +44,17 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import styles from "../module/dash.module.css";
 import Sidebar from "../components/Sidebar";
 import UploadFiles from "../components/UploadFiles";
+import autoTable from "jspdf-autotable";
 
 
-function TabPanel(props) {
-  const { children, value, index } = props;
-  return (
-    <div hidden={value !== index}>
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  );
-}
+// function TabPanel(props) {
+//   const { children, value, index } = props;
+//   return (
+//     <div hidden={value !== index}>
+//       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+//     </div>
+//   );
+// }
 
 function FileUploader() {
   const { startLoading, setResult, setError, isLoading } = useAnalysisStore();
@@ -105,7 +106,6 @@ function FileUploader() {
   const handleClear = () => {
     setFiles([]);
   };
-  
 
   const handleModeChange = (event, newValue) => {
     setUploadMode(newValue);
@@ -196,68 +196,8 @@ function FileUploader() {
   );
 }
 
-//     <Box>
-//     <Paper sx={{ p: 3 }}>
-//       <Grid container spacing={3} alignItems="center">
-//         <Grid item xs={12} md={4}>
-//           <TextField
-//             fullWidth
-//             label="Company Ticker"
-//             variant="outlined"
-//             value={companyTicker}
-//             onChange={(e) => setCompanyTicker(e.target.value)}
-//             placeholder="e.g., AAPL, AMZN"
-//             disabled={isLoading}
-//           />
-//         </Grid>
-//         <Grid item xs={12} md={8}>
-//           <Tabs value={uploadMode} onChange={handleModeChange} centered>
-//             <Tab label="Analyze Single Report" />
-//             <Tab label="Compare Two Reports" />
-//           </Tabs>
-//         </Grid>
-//       </Grid>
-
-//       <Box {...getRootProps()} sx={{ mt: 2, p: 4, textAlign: 'center', border: '2px dashed grey', cursor: isLoading ? 'not-allowed' : 'pointer', backgroundColor: isDragActive ? '#333' : 'transparent' }}>
-//         <input {...getInputProps()} />
-//         <UploadFileIcon sx={{ fontSize: 48, mb: 2 }} />
-//         <Typography variant="h6">
-//           {uploadMode === 0 ? "Drop Current Report" : "Drop Current & Previous Reports"}
-//         </Typography>
-//       </Box>
-
-//       {files.length > 0 && (
-//         <Box sx={{ mt: 2 }}>
-//           <List dense>
-//             {files.map((file, index) => (
-//               <ListItem key={file.path}>
-//                 <ListItemIcon><DescriptionIcon /></ListItemIcon>
-//                 <ListItemText primary={file.path} secondary={index === 0 ? "Current Report" : "Previous Report"} />
-//               </ListItem>
-//             ))}
-//           </List>
-//         </Box>
-//       )}
-
-//       <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-//         <Button
-//           variant="contained"
-//           onClick={handleAnalyze}
-//           disabled={isLoading || files.length === 0 || !companyTicker}
-//         >
-//           {isLoading ? 'Analyzing...' : 'Analyze'}
-//         </Button>
-//         <Button variant="outlined" color="secondary" onClick={handleClear} disabled={isLoading}>
-//           Clear
-//         </Button>
-//       </Box>
-//       </Paper>
-//     </Box>
-//   );
-// }
-
 export default function DashBoard() {
-  const[uploadfile,setuploadfile]=useState(false)
+  const [uploadfile, setuploadfile] = useState(false);
   const [index, setindex] = useState(0);
   const [tabValue, setTabValue] = useState(0);
   const { isLoading, analysisResult } = useAnalysisStore();
@@ -266,20 +206,135 @@ export default function DashBoard() {
   // const dashboardRef = useRef(null); // Ref to the dashboard paper component
   const exportAllTabs = useRef(null);
 
-  const handleExport = () => {
-    if (exportAllTabs.current) {
-      html2canvas(exportAllTabs.current, { scale: 2 }).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`${analysisResult.current.companyTicker}-analysis.pdf`);
-      });
+  // const handleExport = () => {
+  //   if (exportAllTabs.current) {
+  //     html2canvas(exportAllTabs.current, { scale: 2 }).then((canvas) => {
+  //       const imgData = canvas.toDataURL("image/png");
+  //       const pdf = new jsPDF("p", "mm", "a4");
+  //       const pdfWidth = pdf.internal.pageSize.getWidth();
+  //       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  //       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  //       pdf.save(`${analysisResult.current.companyTicker}-analysis.pdf`);
+  //     });
+  //   }
+  // };
+
+
+
+const handleExport = () => {
+  const doc = new jsPDF("p", "mm", "a4");
+  let yPos = 20; // Track manual Y position
+
+  // --- Helper: Add text sections ---
+ const addTextSection = (title, content) => {
+  if (doc.lastAutoTable && doc.lastAutoTable.finalY > yPos) {
+    yPos = doc.lastAutoTable.finalY + 8; // more space after tables
+  }
+
+  if (yPos > 280) {
+    doc.addPage();
+    yPos = 20;
+  }
+
+  // --- Title ---
+  doc.setFontSize(14);
+  doc.text(title, 14, yPos);
+  yPos += 6;
+
+  // --- Content ---
+  if (content && content.trim().length > 0) {
+    doc.setFontSize(10);
+    const cleanContent = content.replace(/\n{3,}/g, "\n\n");
+    const lines = doc.splitTextToSize(cleanContent, 180);
+
+    lines.forEach((line) => {
+      if (yPos > 280) {  
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(line, 14, yPos);
+      yPos += 4.5; // tight line spacing
+    });
+
+    yPos += 5; // BIGGER gap after section
+  } else {
+    yPos += 5; // if no content
+  }
+};
+
+
+  // --- Helper: Add tables ---
+  const addTable = (title, data) => {
+    if (doc.lastAutoTable && doc.lastAutoTable.finalY > yPos) {
+      yPos = doc.lastAutoTable.finalY + 6;
     }
+
+    doc.setFontSize(14);
+    doc.text(title, 14, yPos);
+
+    autoTable(doc, {
+      startY: yPos + 4,
+      head: [["Item", "Current Period", "Previous Period"]],
+      body: data.map(d => [d.item, d.current_period, d.previous_period]),
+      theme: "striped",
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [22, 160, 133] },
+      margin: { left: 14, right: 14 }
+    });
+
+    yPos = doc.lastAutoTable.finalY + 6;
   };
-function upload(){
-    setindex(9)
+
+  // --- 1. Title ---
+  doc.setFontSize(20);
+  doc.text(`AI Financial Analysis: ${analysisResult.companyTicker}`, 105, yPos, { align: "center" });
+  yPos += 15;
+
+  // --- Sections ---
+  addTextSection("Executive Summary", analysisResult.executive_summary.paragraph);
+  addTextSection("Key Takeaways", analysisResult.executive_summary.takeaways.join("\n"));
+
+  const metricsText = `Revenue: ${analysisResult.key_metrics.revenue}$\nNet Income: ${analysisResult.key_metrics.income}$\nEPS: ${analysisResult.key_metrics.eps}`;
+  addTextSection("Key Metrics", metricsText);
+
+  const ratiosText = analysisResult.financial_ratios.ratios.map(r => `${r.name}: ${r.value}`).join("\n");
+  addTextSection("Financial Ratios", ratiosText);
+
+  const benchmark = analysisResult.industry_benchmarks.benchmarks
+    .map(b => `Name: ${b.name}\nValue: ${b.value}\nComparison: ${b.comparison}`)
+    .join("\n\n");
+  addTextSection("Industry Benchmarks", benchmark);
+
+  const manageText = `${analysisResult.management_tone.summary} (Cautiousness score: ${analysisResult.management_tone.cautiousness_score})`;
+  addTextSection("Management Tone", manageText);
+
+  // --- Tables ---
+  addTable("Income Statement", analysisResult.financial_statements.income_statement);
+  addTable("Balance Sheet", analysisResult.financial_statements.balance_sheet);
+  addTable("Cash Flow Statement", analysisResult.financial_statements.cash_flow_statement);
+
+  // --- More sections ---
+  addTextSection("Competitor Analysis", analysisResult.competitor_analysis.competitors.map(c => `Name: ${c.name}\nContext: ${c.context}`).join("\n\n"));
+  addTextSection("Guidance Analysis", analysisResult.guidance_analysis.guidance.map(g => `${g.statement} (${g.sentiment})`).join("\n\n"));
+  addTextSection("ESG Analysis", analysisResult.esg_analysis.esg_mentions.map(e => `Category: ${e.category}\nStatement: ${e.statement}`).join("\n\n"));
+  addTextSection("Governance Changes", analysisResult.governance_changes.join("\n"));
+  addTextSection("Legal Summary", analysisResult.legal_summary.legal_summary.join("\n"));
+  addTextSection("Top Identified Risks", analysisResult.risk_summary.top_risks.join("\n"));
+  addTextSection("AI-Detected Potential Red Flags", analysisResult.red_flags.join("\n"));
+
+  const debt = analysisResult.debt_details.debt_schedule.filter(d => d.principal_due != null).map(d => `${d.year} - Principal Due $${d.principal_due}`).join("\n");
+  addTextSection("Debt Details", debt);
+
+  const footnote = analysisResult.footnote_summary.footnote_summary.map((f, i) => `Note ${i+1}: ${f.topic}\n${f.summary}`).join("\n\n");
+  addTextSection("FootNote Summary", footnote);
+
+  // --- Save ---
+  doc.save(`${analysisResult.companyTicker}-full-analysis.pdf`);
+};
+
+
+  function upload() {
+    setindex(9);
   }
   function Click(i) {
     console.log(i);
@@ -298,7 +353,6 @@ function upload(){
       >
         {!analysisResult && <FileUploader />}
         {analysisResult && (
-        
           <>
             <div
               style={{
@@ -312,8 +366,8 @@ function upload(){
                 alignItems: "center",
               }}
             >
-              <Sidebar handleClick={Click} active={index}/>
-             
+              <Sidebar handleClick={Click} active={index} />
+
               {index == 0 && (
                 <ExecutiveSummary
                   data={analysisResult}
@@ -321,6 +375,7 @@ function upload(){
                   handleupload={upload}
                   filename={analysisResult.filename}
                   ticker={analysisResult.companyTicker}
+                  handleExport={handleExport}
                 />
               )}
               {index == 1 && (
@@ -524,8 +579,7 @@ function upload(){
             </TabPanel> */}
             </div>
           </>
-          )}
-        
+        )}
       </div>
     </>
   );
