@@ -1,4 +1,4 @@
-# 📊 AI-Powered Financial Report Deconstructor & Analytical Co-Pilot
+#  AI-Powered Financial Report Deconstructor & Analytical Co-Pilot
 
 ##  TL;DR – Why This Project Stands Out
 - **AI-Powered Financial Analyst Co-Pilot** → Automates deep analysis of 10-K/10-Q filings, saving analysts hours of manual review.  
