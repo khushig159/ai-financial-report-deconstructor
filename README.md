@@ -1,6 +1,6 @@
 # 📊 AI-Powered Financial Report Deconstructor & Analytical Co-Pilot
 
-## 🚀 TL;DR – Why This Project Stands Out
+##  TL;DR – Why This Project Stands Out
 - **AI-Powered Financial Analyst Co-Pilot** → Automates deep analysis of 10-K/10-Q filings, saving analysts hours of manual review.  
 - **Interactive Dashboard + PDF Export** → Rich visualizations (graphs, ratios, trends) with one-click export to professional-grade reports.  
 - **Differential Analysis Engine** → Compares current vs. previous filings (or cross-company) to surface meaningful changes instantly.  
@@ -8,24 +8,24 @@
 
 ---
 
-## 🧩 The Problem: The Analyst’s Bottleneck
+##  The Problem: The Analyst’s Bottleneck
 Financial analysts at institutions like **J.P. Morgan** spend thousands of hours manually combing through 50+ page quarterly (10-Q) and annual (10-K) reports.  
 This workflow is:  
-- ⏳ Time-consuming  
-- ⚠️ Prone to human error  
-- 🔎 Makes it difficult to catch subtle but critical changes between reporting periods  
+-  Time-consuming  
+-  Prone to human error  
+-  Makes it difficult to catch subtle but critical changes between reporting periods  
 
 Key data extraction, ratio calculations, risk identification, and tone analysis are **manual repetitive tasks** that slow down the entire financial decision-making process.
 
 ---
 
-## 💡 The Solution: An AI-Driven Analytical Co-Pilot
+##  The Solution: An AI-Driven Analytical Co-Pilot
 This project is a **professional-grade, full-stack web platform** that solves this bottleneck.  
 It transforms **unstructured PDF data into structured, actionable insights** in minutes, freeing analysts to focus on strategy instead of low-level report parsing.  
 
 ---
 
-## 🧭 User Workflow  
+##  User Workflow  
 
 1. **Authentication** → Secure login/signup with Email/Password or Google   
 2. **Upload** → Choose one of two modes:  
@@ -41,20 +41,20 @@ It transforms **unstructured PDF data into structured, actionable insights** in 
 
 ---
 
-## ✨ Key Features  
+##  Key Features  
 
-### 📑 Core Analysis  
+###  Core Analysis  
 - **Executive Summary & Key Takeaways** → AI-generated “blink report” for quick digestion.  
 - **Keyword & Change Detection** → Highlights **word-level differences** between current and previous reports.  
 - **Financial Statements Parser** → Income Statement, Balance Sheet, and Cash Flow are deconstructed into structured, clickable tables.  
 
-### 📊 Visualization Everywhere  
+###  Visualization Everywhere  
 - **Metrics Dashboard** → Stat cards for Revenue, Net Income, EPS, Gross Margin, Debt Ratio, etc.  
 - **Bar & Line Charts** → Revenue vs Net Income bar chart; Historical trends for any metric.  
 - **Interactive Statements** → Click a line item to instantly see its historical trend chart.  
 - **Explain This Chart** → Every visualization has an **AI text explanation** that interprets the chart.  
 
-### 🕵️ Deep Insights  
+###  Deep Insights  
 - **Management Tone Analysis** → Sentiment + cautiousness score of earnings call language.  
 - **Risk & Red Flags** → Automated detection of unusual accounting shifts, vague wording, or anomalies.  
 - **Strategic & Legal Overview** → Competitors mentioned, governance changes, lawsuits & investigations.  
@@ -63,7 +63,7 @@ It transforms **unstructured PDF data into structured, actionable insights** in 
 - **Footnote Explorer** → Summarized, searchable view of dense accounting notes.  
 - **Sustainability (ESG)** → Extraction & summarization of Environmental, Social, and Governance mentions.  
 
-### 📤 Export & Reporting  
+###  Export & Reporting  
 - **PDF Export** → Clean, text-based, structured PDF with all sections.  
 - **Smart History** → Every report uploaded is stored in MongoDB and linked to a ticker. Enables auto-comparison with past filings.  
 
@@ -77,7 +77,7 @@ It transforms **unstructured PDF data into structured, actionable insights** in 
 **Auth** → Firebase Authentication (Email/Password + Google SSO)  
 **Database** → MongoDB Atlas (NoSQL, cloud-based)  
 
-## ⚡ Future Enhancements
+##  Future Enhancements
 
 - Advanced Time-Series Modeling → Predictive analytics on financial metrics using ML models.
 -  Multi-Company Peer Benchmarking → Compare any company’s results vs. sector/industry peers.
@@ -94,7 +94,7 @@ It transforms **unstructured PDF data into structured, actionable insights** in 
 
 ---
 
-## ⚡ Getting Started  
+##  Getting Started  
 
 ### Prerequisites  
 - Node.js (v18+)  
@@ -133,7 +133,7 @@ echo "VITE_API_GATEWAY_URL=http://localhost:5000" > .env
 npm run dev
 
 
-## 🖥️ System Architecture  
+##  System Architecture  
 
 [User's Browser (React Frontend)]
 |
