@@ -64,7 +64,6 @@ It transforms **unstructured PDF data into structured, actionable insights** in 
 - **PDF Export** → Clean, text-based, structured PDF with all sections.  
 - **Smart History** → Every report uploaded is stored in MongoDB and linked to a ticker. Enables auto-comparison with past filings.  
 
-**NOTE**: This website is not responsive yet, future enhancements yet to be done, BUT it is fully functional so you can use it without any hesitation 
 ---
 
 ## 🛠️ Tech Stack  
@@ -85,6 +84,9 @@ It transforms **unstructured PDF data into structured, actionable insights** in 
 -   Global Filing Support → Extend parsing for non-SEC filings (India MCA, EU ESMA, etc.).
 -  Smart Alerts → Automated notifications when new filings are released or anomalies detected.
 -   Mobile Dashboard → Lightweight version for analysts on the go.
+
+*NOTE* -> This website is not responsive yet, future enhancements yet to be done, BUT it is fully functional so you can use it without any hesitation 
+
 
 ---
 
