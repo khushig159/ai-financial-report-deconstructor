@@ -87,6 +87,7 @@ It transforms **unstructured PDF data into structured, actionable insights** in 
 -   Global Filing Support → Extend parsing for non-SEC filings (India MCA, EU ESMA, etc.).
 -  Smart Alerts → Automated notifications when new filings are released or anomalies detected.
 -   Mobile Dashboard → Lightweight version for analysts on the go.
+-   Personalised ChatBot -> Based on the contents of the provided 10K/10Q report, system instructions can be give to the ai agent so that it can solve any query of the user related to the report
 
 *NOTE* -> This website is not responsive yet, future enhancements yet to be done, BUT it is fully functional so you can use it without any hesitation 
 
