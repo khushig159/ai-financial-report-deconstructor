@@ -20,7 +20,6 @@ export const register = async (req, res) => {
 
     } catch (error) {
         console.error("Error creating new user:", error.code, error.message);
-        // Provide a more specific error message if possible
         let errorMessage = "Failed to create user.";
         if (error.code === 'auth/email-already-exists') {
             errorMessage = "The email address is already in use by another account.";

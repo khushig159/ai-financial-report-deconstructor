@@ -197,35 +197,13 @@ function FileUploader() {
 }
 
 export default function DashBoard() {
-  const [uploadfile, setuploadfile] = useState(false);
   const [index, setindex] = useState(0);
-  const [tabValue, setTabValue] = useState(0);
-  const { isLoading, analysisResult } = useAnalysisStore();
-  const handleTabChange = (event, newValue) => setTabValue(newValue);
-  const [loading, setLoading] = useState(false);
-  // const dashboardRef = useRef(null); // Ref to the dashboard paper component
-  const exportAllTabs = useRef(null);
-
-  // const handleExport = () => {
-  //   if (exportAllTabs.current) {
-  //     html2canvas(exportAllTabs.current, { scale: 2 }).then((canvas) => {
-  //       const imgData = canvas.toDataURL("image/png");
-  //       const pdf = new jsPDF("p", "mm", "a4");
-  //       const pdfWidth = pdf.internal.pageSize.getWidth();
-  //       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-  //       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-  //       pdf.save(`${analysisResult.current.companyTicker}-analysis.pdf`);
-  //     });
-  //   }
-  // };
-
-
+  const { analysisResult } = useAnalysisStore();
 
 const handleExport = () => {
   const doc = new jsPDF("p", "mm", "a4");
   let yPos = 20; // Track manual Y position
 
-  // --- Helper: Add text sections ---
  const addTextSection = (title, content) => {
   if (doc.lastAutoTable && doc.lastAutoTable.finalY > yPos) {
     yPos = doc.lastAutoTable.finalY + 8; // more space after tables
@@ -263,7 +241,6 @@ const handleExport = () => {
 };
 
 
-  // --- Helper: Add tables ---
   const addTable = (title, data) => {
     if (doc.lastAutoTable && doc.lastAutoTable.finalY > yPos) {
       yPos = doc.lastAutoTable.finalY + 6;
@@ -285,12 +262,10 @@ const handleExport = () => {
     yPos = doc.lastAutoTable.finalY + 6;
   };
 
-  // --- 1. Title ---
   doc.setFontSize(20);
   doc.text(`AI Financial Analysis: ${analysisResult.companyTicker}`, 105, yPos, { align: "center" });
   yPos += 15;
 
-  // --- Sections ---
   addTextSection("Executive Summary", analysisResult.executive_summary.paragraph);
   addTextSection("Key Takeaways", analysisResult.executive_summary.takeaways.join("\n"));
 
@@ -434,149 +409,6 @@ const handleExport = () => {
                 />
               )}
               {index == 9 && <UploadFiles />}
-              {/* <Paper sx={{ mt: 4 }} > */}
-
-              {/* <TabPanel value={tabValue} index={0}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <ExecutiveSummary data={analysisResult} />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={1}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <MetricsDashboard
-                  data={analysisResult?.key_metrics}
-                  analysisResult={analysisResult}
-                  context={analysisResult?.raw_management_discussion}
-                />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={2}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <FinancialStatements
-                  data={analysisResult?.financial_statements}
-                  analysisResult={analysisResult}
-                />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={3}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <RatioAnalysis
-                  data={analysisResult?.financial_ratios}
-                  benchmarkData={analysisResult?.industry_benchmarks}
-                />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={4}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <RiskDiffViewer
-                  oldText={analysisResult?.previous_raw_risk_factors}
-                  newText={analysisResult?.raw_risk_factors}
-                  comparisonSummary={analysisResult?.risk_comparison}
-                  wordCloudData={analysisResult?.risk_wordcloud}
-                />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={5}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <ManagementTone data={analysisResult?.management_tone} />{" "}
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={6}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <CompetitorAnalysis data={analysisResult?.competitor_analysis} />{" "}
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={7}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <LegalSummary data={analysisResult?.legal_summary} />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={8}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <GuidanceOutlook data={analysisResult?.guidance_analysis} />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={9}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <RiskSummary
-                  data={analysisResult?.risk_summary}
-                  redFlagsData={analysisResult?.red_flags}
-                />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={10}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <GovernanceChanges data={analysisResult?.governance_changes} />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={11}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <HistoricalTrends analysisResult={analysisResult} 
-                context={analysisResult?.raw_management_discussion}/>
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={12}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <DebtSchedule data={analysisResult?.debt_details} 
-                context={`List of debts taken by the company and it's maturity${analysisResult?.debt_details}`}/>
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={13}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <EsgAnalysis data={analysisResult?.esg_analysis} 
-                />
-              </Typography>
-            </TabPanel>
-            <TabPanel value={tabValue} index={14}>
-              <Typography
-                component="pre"
-                sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                <FootnoteExplorer data={analysisResult?.footnote_summary} />
-              </Typography>
-            </TabPanel> */}
             </div>
           </>
         )}

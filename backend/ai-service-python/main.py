@@ -215,9 +215,6 @@ async def get_legal_summary(full_text: str):
     try:
         model = genai.GenerativeModel('gemini-1.5-pro-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
         
-        # --- THE CRITICAL OPTIMIZATION IS HERE ---
-        # We create a "middle chunk" of the document to search within.
-        # This starts after the typical intro sections and covers a large area.
         start_char = 15000  # Skip the first ~15 pages of boilerplate
         end_char = 150000 # Search within the next ~135 pages
         # middle_chunk = full_text[start_char:end_char]
@@ -228,6 +225,7 @@ async def get_legal_summary(full_text: str):
     except Exception as e:
         print(f"--- ERROR in Legal Summary: {e}")
         return {"legal_summary": ["Error summarizing legal proceedings."]}
+    
 async def get_guidance_analysis(mda_text: str):
     """Identifies and classifies forward-looking statements."""
     print("--- AI Task: Analyzing Guidance & Outlook ---")

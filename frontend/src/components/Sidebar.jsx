@@ -30,12 +30,10 @@ export default function Sidebar({ handleClick, active }) {
     { icon: faClockRotateLeft, title: "Risk & History" },
     { icon: faBookOpen, title: "Footnote Explorer" },
     { icon: faLeaf, title: "Sustainability & Debt" },
-    // {icon:faUpload,title:'Upload Files'}
   ];
   const handleLogout = async () => {
       try {
         await signOut(auth);
-        // The onAuthStateChanged listener will handle the state update
       } catch (error) {
         console.error("Error signing out:", error);
       }

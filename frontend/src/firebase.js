@@ -1,10 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyB16r520h0I1t_H9Frq3m7Vzdz2GkVw4r0",
   authDomain: "aifinancialanalyser.firebaseapp.com",
@@ -15,7 +11,6 @@ const firebaseConfig = {
   measurementId: "G-6KHWX5D1KN"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 export const auth=getAuth(app);

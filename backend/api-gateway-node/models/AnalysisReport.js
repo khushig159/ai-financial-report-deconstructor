@@ -26,10 +26,10 @@ const AnalysisReportSchema = new mongoose.Schema({
     comparison_summary: [String]
   },
   risk_wordcloud: {
-      wordcloud_data: [{
-          text: String,
-          value: Number,
-      }]
+    wordcloud_data: [{
+      text: String,
+      value: Number,
+    }]
   },
   raw_risk_factors: { type: String },
   previous_raw_risk_factors: { type: String },
@@ -64,7 +64,7 @@ const AnalysisReportSchema = new mongoose.Schema({
     benchmarks: [{
       name: String,
       value: String,
-      comparison: String, // e.g., "Above Average", "Below Average"
+      comparison: String, 
     }]
   },
   debt_details: {

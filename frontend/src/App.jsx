@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  createTheme,
   ThemeProvider,
   CssBaseline,
   Box,
@@ -17,61 +16,31 @@ import {
 } from "@mui/material";
 import useAnalysisStore from "./stores/useAnalysisStore";
 import AuthPage from "./pages/AuthPage";
-import { auth } from "./firebase";
-import { signOut } from "firebase/auth";
+// import { auth } from "./firebase";
+// import { signOut } from "firebase/auth";
 import DashBoard from "./pages/DashBoard";
-
-// const darkTheme = createTheme({
-//   palette: {
-//     mode: "dark",
-//     primary: { main: "#90caf9" },
-//     background: { default: "#fff", paper: "#fff" },
-//   },
-//   typography: {
-//     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-//     h4: { fontWeight: 700 },
-//     h5: { fontWeight: 600 },
-//   },
-// });
-
 
 
 function App() {
   const { currentUser, isAuthLoading,error,isLoading } = useAnalysisStore();
-const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      // The onAuthStateChanged listener will handle the state update
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
+// const handleLogout = async () => {
+//     try {
+//       await signOut(auth);
+//     } catch (error) {
+//       console.error("Error signing out:", error);
+//     }
+//   };
   if (isAuthLoading) {
     return (
-      // <ThemeProvider theme={darkTheme}>
-        // <CssBaseline />
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
           <CircularProgress />
         </Box>
-      // </ThemeProvider>
     );
   }
   return (
-    // <ThemeProvider theme={darkTheme}>
       < >
      
-        {/* <AppBar position="static"> */}
-          {/* <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              AI Financial Report Deconstructor
-            </Typography>
-            {currentUser && (
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
-              </Button>
-            )}
-          </Toolbar> */}
-        {/* </AppBar> */}
+        
         <Container component="main" sx={{ mt: 4, mb: 4 }}>
           {currentUser ? <DashBoard /> : <AuthPage />}
           {error && (<Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>)}
@@ -103,9 +72,7 @@ const handleLogout = async () => {
             </Box>
           </Fade>
         </Modal>
-      {/* </Box> */}
       </>
-    // </ThemeProvider>
   );
 }
 

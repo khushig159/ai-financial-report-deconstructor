@@ -4,7 +4,6 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 
-// Helper function to determine the sentiment and style of the comparison
 const getComparisonStyle = (comparisonText) => {
   const text = comparisonText.toLowerCase();
   if (text.includes("strong") || text.includes("above average") || text.includes("healthy")) {
@@ -20,7 +19,7 @@ function BenchmarkDisplay({ data }) {
   const benchmarks = data?.benchmarks;
 
   if (!benchmarks || benchmarks.length === 0) {
-    return null; // Don't render anything if there's no data
+    return null; 
   }
 
   return (
